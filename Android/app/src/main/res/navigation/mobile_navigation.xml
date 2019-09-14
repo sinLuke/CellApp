@@ -3,41 +3,60 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/mobile_navigation"
-    app:startDestination="@+id/nav_home">
+    app:startDestination="@+id/nav_today">
 
     <fragment
-        android:id="@+id/nav_home"
-        android:name="com.cellgroup.cellapp.ui.home.HomeFragment"
-        android:label="@string/menu_home"
+        android:id="@+id/nav_today"
+        android:name="com.cellgroup.cellapp.ui.today.TodayFragment"
+        android:label="@string/menu_today"
         tools:layout="@layout/fragment_home" />
 
     <fragment
-        android:id="@+id/nav_gallery"
-        android:name="com.cellgroup.cellapp.ui.gallery.GalleryFragment"
-        android:label="@string/menu_gallery"
+        android:id="@+id/nav_favorite"
+        android:name="com.cellgroup.cellapp.ui.favorite.FavoriteFragment"
+        android:label="@string/menu_favorite"
         tools:layout="@layout/fragment_gallery" />
 
     <fragment
-        android:id="@+id/nav_slideshow"
-        android:name="com.cellgroup.cellapp.ui.slideshow.SlideshowFragment"
-        android:label="@string/menu_slideshow"
+        android:id="@+id/nav_edit_profile"
+        android:name="com.cellgroup.cellapp.ui.setting.SettingFragment"
+        android:label="@string/menu_edit_profile"
         tools:layout="@layout/fragment_slideshow" />
 
     <fragment
-        android:id="@+id/nav_tools"
+        android:id="@+id/nav_setting"
         android:name="com.cellgroup.cellapp.ui.tools.ToolsFragment"
-        android:label="@string/menu_tools"
+        android:label="@string/menu_setting"
         tools:layout="@layout/fragment_tools" />
 
     <fragment
-        android:id="@+id/nav_share"
-        android:name="com.cellgroup.cellapp.ui.share.ShareFragment"
-        android:label="@string/menu_share"
+        android:id="@+id/menu_show_all"
+        android:name="com.cellgroup.cellapp.ui.topics.TopicFragment"
+        android:label="@string/menu_show_all"
         tools:layout="@layout/fragment_share" />
 
     <fragment
-        android:id="@+id/nav_send"
-        android:name="com.cellgroup.cellapp.ui.send.SendFragment"
-        android:label="@string/menu_send"
-        tools:layout="@layout/fragment_send" />
+        android:id="@+id/menu_topic_0"
+        android:name="com.cellgroup.cellapp.ui.topics.TopicFragment"
+        android:label="@string/menu_topic_0"
+        tools:layout="@layout/fragment_share" />
+
+    <fragment
+        android:id="@+id/menu_topic_1"
+        android:name="com.cellgroup.cellapp.ui.topics.TopicFragment"
+        android:label="@string/menu_topic_1"
+        tools:layout="@layout/fragment_share" />
+
+    <fragment
+        android:id="@+id/menu_topic_2"
+        android:name="com.cellgroup.cellapp.ui.topics.TopicFragment"
+        android:label="@string/menu_topic_2"
+        tools:layout="@layout/fragment_share" />
+
+    <fragment
+        android:id="@+id/menu_topic_3"
+        android:name="com.cellgroup.cellapp.ui.topics.TopicFragment"
+        android:label="@string/menu_topic_3"
+        tools:layout="@layout/fragment_share" />
+
 </navigation>

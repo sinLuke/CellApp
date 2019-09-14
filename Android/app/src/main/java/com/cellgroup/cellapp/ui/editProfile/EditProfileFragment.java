@@ -1,4 +1,4 @@
-package com.cellgroup.cellapp.ui.share;
+package com.cellgroup.cellapp.ui.editProfile;
 
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -14,17 +14,17 @@ import androidx.lifecycle.ViewModelProviders;
 
 import com.cellgroup.cellapp.R;
 
-public class ShareFragment extends Fragment {
+public class EditProfileFragment extends Fragment {
 
-    private ShareViewModel shareViewModel;
+    private EditProfileModel mEditProfileModel;
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
-        shareViewModel =
-                ViewModelProviders.of(this).get(ShareViewModel.class);
+        mEditProfileModel =
+                ViewModelProviders.of(this).get(EditProfileModel.class);
         View root = inflater.inflate(R.layout.fragment_share, container, false);
         final TextView textView = root.findViewById(R.id.text_share);
-        shareViewModel.getText().observe(this, new Observer<String>() {
+        mEditProfileModel.getText().observe(this, new Observer<String>() {
             @Override
             public void onChanged(@Nullable String s) {
                 textView.setText(s);

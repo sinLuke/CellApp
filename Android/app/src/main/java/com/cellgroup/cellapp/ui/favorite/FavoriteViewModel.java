@@ -1,14 +1,14 @@
-package com.cellgroup.cellapp.ui.send;
+package com.cellgroup.cellapp.ui.favorite;
 
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
-public class SendViewModel extends ViewModel {
+public class FavoriteViewModel extends ViewModel {
 
     private MutableLiveData<String> mText;
 
-    public SendViewModel() {
+    public FavoriteViewModel() {
         mText = new MutableLiveData<>();
         mText.setValue("This is send fragment");
     }
