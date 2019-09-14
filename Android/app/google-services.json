@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "854633007097",
+    "firebase_url": "https://cell-app.firebaseio.com",
+    "project_id": "cell-app",
+    "storage_bucket": "cell-app.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:854633007097:android:0dbbba5819e01f092fdf28",
+        "android_client_info": {
+          "package_name": "com.cellgroup.cellapp"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "854633007097-i50h3jod75l1deaqukpfi8fvskktosr9.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB9deOvn75HB14x_G-rW_8B6ww8FOFwyCY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "854633007097-i50h3jod75l1deaqukpfi8fvskktosr9.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
