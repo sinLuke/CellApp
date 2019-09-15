@@ -22,8 +22,8 @@ public class EditProfileFragment extends Fragment {
                              ViewGroup container, Bundle savedInstanceState) {
         mEditProfileModel =
                 ViewModelProviders.of(this).get(EditProfileModel.class);
-        View root = inflater.inflate(R.layout.fragment_share, container, false);
-        final TextView textView = root.findViewById(R.id.text_share);
+        View root = inflater.inflate(R.layout.fragment_edit_profile, container, false);
+        final TextView textView = root.findViewById(R.id.text_edit_profile);
         mEditProfileModel.getText().observe(this, new Observer<String>() {
             @Override
             public void onChanged(@Nullable String s) {

@@ -22,8 +22,8 @@ public class FavoriteFragment extends Fragment {
                              ViewGroup container, Bundle savedInstanceState) {
         mFavoriteViewModel =
                 ViewModelProviders.of(this).get(FavoriteViewModel.class);
-        View root = inflater.inflate(R.layout.fragment_send, container, false);
-        final TextView textView = root.findViewById(R.id.text_send);
+        View root = inflater.inflate(R.layout.fragment_favorite, container, false);
+        final TextView textView = root.findViewById(R.id.text_favorite);
         mFavoriteViewModel.getText().observe(this, new Observer<String>() {
             @Override
             public void onChanged(@Nullable String s) {

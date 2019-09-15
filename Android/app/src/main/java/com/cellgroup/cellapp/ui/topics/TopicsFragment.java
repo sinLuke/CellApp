@@ -1,4 +1,4 @@
-package com.cellgroup.cellapp.ui.tools;
+package com.cellgroup.cellapp.ui.topics;
 
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -14,17 +14,17 @@ import androidx.lifecycle.ViewModelProviders;
 
 import com.cellgroup.cellapp.R;
 
-public class ToolsFragment extends Fragment {
+public class TopicsFragment extends Fragment {
 
-    private ToolsViewModel toolsViewModel;
+    private TopicsViewModel mTopicsViewModel;
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
-        toolsViewModel =
-                ViewModelProviders.of(this).get(ToolsViewModel.class);
-        View root = inflater.inflate(R.layout.fragment_tools, container, false);
-        final TextView textView = root.findViewById(R.id.text_tools);
-        toolsViewModel.getText().observe(this, new Observer<String>() {
+        mTopicsViewModel =
+                ViewModelProviders.of(this).get(TopicsViewModel.class);
+        View root = inflater.inflate(R.layout.fragment_topics, container, false);
+        final TextView textView = root.findViewById(R.id.text_topics);
+        mTopicsViewModel.getText().observe(this, new Observer<String>() {
             @Override
             public void onChanged(@Nullable String s) {
                 textView.setText(s);

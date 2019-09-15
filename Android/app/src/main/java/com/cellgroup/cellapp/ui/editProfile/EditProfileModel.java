@@ -10,7 +10,7 @@ public class EditProfileModel extends ViewModel {
 
     public EditProfileModel() {
         mText = new MutableLiveData<>();
-        mText.setValue("This is share fragment");
+        mText.setValue("This is edit profile fragment");
     }
 
     public LiveData<String> getText() {
