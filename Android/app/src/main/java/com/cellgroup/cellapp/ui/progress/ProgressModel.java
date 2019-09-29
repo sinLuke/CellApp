@@ -1,16 +1,16 @@
-package com.cellgroup.cellapp.ui.setting;
+package com.cellgroup.cellapp.ui.progress;
 
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
-public class SettingViewModel extends ViewModel {
+public class ProgressModel extends ViewModel {
 
     private MutableLiveData<String> mText;
 
-    public SettingViewModel() {
+    public ProgressModel() {
         mText = new MutableLiveData<>();
-        mText.setValue("This is setting fragment");
+        mText.setValue("This is progress fragment");
     }
 
     public LiveData<String> getText() {

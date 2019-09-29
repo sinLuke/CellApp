@@ -1,5 +1,6 @@
 package com.cellgroup.cellapp.ui;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.PersistableBundle;
 
@@ -14,8 +15,8 @@ public abstract class SingleFragmentActivity extends AppCompatActivity {
     protected abstract Fragment createFragment();
 
     @Override
-    public void onCreate(@Nullable Bundle savedInstanceState, @Nullable PersistableBundle persistentState) {
-        super.onCreate(savedInstanceState, persistentState);
+    protected void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_fragment);
 
         FragmentManager fm = getSupportFragmentManager();
@@ -25,5 +26,10 @@ public abstract class SingleFragmentActivity extends AppCompatActivity {
             f = createFragment();
             fm.beginTransaction().add(R.id.fragment_container, f).commit();
         }
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
     }
 }

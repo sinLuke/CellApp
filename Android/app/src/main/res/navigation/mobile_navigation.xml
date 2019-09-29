@@ -19,8 +19,8 @@
 
     <fragment
         android:id="@+id/nav_edit_profile"
-        android:name="com.cellgroup.cellapp.ui.editProfile.EditProfileFragment"
-        android:label="@string/menu_edit_profile"
+        android:name="com.cellgroup.cellapp.ui.progress.ProgressFragment"
+        android:label="@string/menu_progress"
         tools:layout="@layout/fragment_setting" />
 
     <fragment
@@ -28,35 +28,5 @@
         android:name="com.cellgroup.cellapp.ui.setting.SettingFragment"
         android:label="@string/menu_setting"
         tools:layout="@layout/fragment_topics" />
-
-    <fragment
-        android:id="@+id/nav_show_all"
-        android:name="com.cellgroup.cellapp.ui.topics.TopicsFragment"
-        android:label="@string/menu_show_all"
-        tools:layout="@layout/fragment_show_all" />
-
-    <fragment
-        android:id="@+id/nav_topic_0"
-        android:name="com.cellgroup.cellapp.ui.topics.TopicsFragment"
-        android:label="@string/menu_topic_0"
-        tools:layout="@layout/fragment_show_all" />
-
-    <fragment
-        android:id="@+id/nav_topic_1"
-        android:name="com.cellgroup.cellapp.ui.topics.TopicsFragment"
-        android:label="@string/menu_topic_1"
-        tools:layout="@layout/fragment_show_all" />
-
-    <fragment
-        android:id="@+id/nav_topic_2"
-        android:name="com.cellgroup.cellapp.ui.topics.TopicsFragment"
-        android:label="@string/menu_topic_2"
-        tools:layout="@layout/fragment_show_all" />
-
-    <fragment
-        android:id="@+id/nav_topic_3"
-        android:name="com.cellgroup.cellapp.ui.topics.TopicsFragment"
-        android:label="@string/menu_topic_3"
-        tools:layout="@layout/fragment_show_all" />
 
 </navigation>

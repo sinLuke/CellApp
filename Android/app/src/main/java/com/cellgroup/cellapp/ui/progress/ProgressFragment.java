@@ -1,4 +1,4 @@
-package com.cellgroup.cellapp.ui.topics;
+package com.cellgroup.cellapp.ui.progress;
 
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -14,17 +14,17 @@ import androidx.lifecycle.ViewModelProviders;
 
 import com.cellgroup.cellapp.R;
 
-public class TopicsFragment extends Fragment {
+public class ProgressFragment extends Fragment {
 
-    private TopicsViewModel mTopicsViewModel;
+    private ProgressModel mProgressModel;
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
-        mTopicsViewModel =
-                ViewModelProviders.of(this).get(TopicsViewModel.class);
-        View root = inflater.inflate(R.layout.fragment_topics, container, false);
-        final TextView textView = root.findViewById(R.id.text_topics);
-        mTopicsViewModel.getText().observe(this, new Observer<String>() {
+        mProgressModel =
+                ViewModelProviders.of(this).get(ProgressModel.class);
+        View root = inflater.inflate(R.layout.fragment_progress, container, false);
+        final TextView textView = root.findViewById(R.id.text_progress);
+        mProgressModel.getText().observe(this, new Observer<String>() {
             @Override
             public void onChanged(@Nullable String s) {
                 textView.setText(s);

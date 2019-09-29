@@ -6,10 +6,11 @@
     <string name="nav_header_subtitle">android.studio@android.com</string>
     <string name="nav_header_desc">Navigation header</string>
     <string name="action_settings">Settings</string>
+    <string name="no_back">Back is not allowed</string>
 
     <string name="menu_today">Today</string>
     <string name="menu_favorite">Favorite</string>
-    <string name="menu_edit_profile">Edit Profile</string>
+    <string name="menu_progress">Progress</string>
     <string name="menu_setting">Setting</string>
     <string name="menu_show_all">Show All</string>
 
@@ -18,7 +19,46 @@
     <string name="menu_topic_2">Topic 2</string>
     <string name="menu_topic_3">Topic 3</string>
 
+    //Login
+    <string name="login_welcome">Welcome to the Cell App</string>
+    <string name="login_button_login">Login</string>
+    <string name="login_button_signin">Signin</string>
+    <string name="login_button_forget_password">Forget password</string>
+    <string name="login_button_login_google">Login with Google</string>
+    <string name="login_bad_email">Email address is not valid</string>
+    <string name="login_empty_password">Password file is empty</string>
+    <string name="login_bad_password">Two passwords didn\'t match</string>
+
+    //UserManager
+    <string name="user_manager_email_reset">A password reset Email has been sent</string>
+    <string name="user_manager_password_reset">Password has been reset</string>
+    <string name="user_manager_email_verify">A varify Email has been sent</string>
+    <string name="user_manager_email_update">Email has been updated</string>
+    <string name="user_manager_profile_update">Email has been updated</string>
+
+    //Setting
+    <string name="setting_change_display_name">Display Name</string>
+    <string name="setting_change_email">Email Address</string>
+    <string name="setting_change_password">Password</string>
+    <string name="setting_change_profile_picture">Profile Picture</string>
+    <string name="setting_erase">Erase all my progress</string>
+    <string name="setting_logout">Log out</string>
+    <string name="setting_edit_user_profile">Edit user profile</string>
+
+    //Initialize User
+    <string name="init_headline">Let\'s set up this user</string>
+    <string name="init_change_profile_picture">Pick a Profile Picture</string>
+    <string name="init_take_profile_picture">Take a Profile Picture</string>
+    <string name="init_button_finish">Finish</string>
+    <string name="init_not_me">Not me?</string>
+
+    //Activity Tittles
+    <string name="activity_title_login">Login</string>
+    <string name="activity_title_initalize">Set up a new user</string>
 
     //initial
     <string name="login_unsuccessful">Login Unsuccessful</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>

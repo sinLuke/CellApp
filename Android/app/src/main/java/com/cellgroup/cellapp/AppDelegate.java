@@ -4,12 +4,16 @@ import android.app.Activity;
 
 import android.content.Intent;
 import android.database.sqlite.SQLiteDatabase;
+import android.widget.Toast;
 
 import com.cellgroup.cellapp.network.DataManager;
 
+import com.cellgroup.cellapp.network.UserManager;
+import com.cellgroup.cellapp.ui.login.LoginActivity;
 import com.firebase.ui.auth.AuthUI;
 import com.firebase.ui.auth.IdpResponse;
 import com.google.android.material.snackbar.Snackbar;
+import com.google.firebase.auth.FirebaseUser;
 
 import java.util.Arrays;
 import java.util.List;
@@ -21,53 +25,66 @@ public class AppDelegate {
     public static AppDelegate shared = new AppDelegate();
 
     private Activity currentActivity;
+    private DataManager sharedDataManager;
+    private UserManager sharedUserManager;
 
     private void AppDelegate(){return;}
 
     public void applicationDidlaunched(Activity activity) {
-
+        applicationShouldRequireLogin(activity);
     }
 
+    //handling login
     public void applicationShouldRequireLogin(Activity activity) {
+
         currentActivity = activity;
-        List<AuthUI.IdpConfig> providers = Arrays.asList(
-                new AuthUI.IdpConfig.EmailBuilder().build(),
-                new AuthUI.IdpConfig.GoogleBuilder().build());
-
-        // Create and launch sign-in intent
-        activity.startActivityForResult(
-                AuthUI.getInstance()
-                        .createSignInIntentBuilder()
-                        .setAvailableProviders(providers)
-                        .build(),
-                RC_SIGN_IN);
-    }
-
-    public void handleActivityResult(int requestCode, int resultCode, Intent data, Activity activity) {
-        currentActivity = activity;
-        if (requestCode == RC_SIGN_IN) {
-            IdpResponse response = IdpResponse.fromResultIntent(data);
-
-            if (resultCode == activity.RESULT_OK) {
-                applicationDidFinisheLogin(activity);
-            } else {
-                Snackbar.make(activity.findViewById(R.id.initial_content), R.string.login_unsuccessful, Snackbar.LENGTH_LONG).show();
-                this.applicationShouldRequireLogin(activity);
-            }
+        FirebaseUser user = UserManager.getCurrentUser();
+        if (user == null) {
+            Intent i = new Intent(currentActivity, LoginActivity.class);
+            currentActivity.startActivity(i);
+        } else {
+            UserManager.getUserManager(user, activity);
         }
     }
 
-    public void applicationDidFinisheLogin(Activity activity) {
-        DataManager.shared.checkOnlineDatabaseVersion(activity);
+    public void applicationDidFinisheLogin(Activity activity, UserManager pSharedUserManager) {
+        sharedUserManager = pSharedUserManager;
+        applicationWillInitalizeUser(activity);
+    }
+
+    //Initialize User for first time login, receive UserManager callback
+    public void applicationWillInitalizeUser(Activity activity) {
+        sharedUserManager.checkIfUserFirstLogin(activity);
+    }
+
+    public void applicationDidFinisheInitializeUser(Activity activity) {
+        DataManager.getDataManager(activity);
+    }
+
+    //receive DataManager callback
+    public void DatabseDidFinishCheckingUpdates(SQLiteDatabase db, DataManager pSharedDataManager){
+        applicationMoveToMainScreen();
+        sharedDataManager = pSharedDataManager;
+    }
+
+    //handling exception
+    public void applicationDidReportException(String withMessage){
+        if (currentActivity != null) {
+            Toast.makeText(currentActivity, withMessage, Toast.LENGTH_LONG).show();
+            applicationShouldRequireLogin(currentActivity);
+        }
     }
 
     public void applicationMoveToMainScreen() {
-
         Intent i = new Intent(currentActivity, MainActivity.class);
         currentActivity.startActivity(i);
     }
 
-    public void DatabseDidFinishCheckingUpdates(SQLiteDatabase db){
-        applicationMoveToMainScreen();
+    public UserManager getSharedUserManager(){
+        return sharedUserManager;
+    }
+
+    public DataManager getSharedDataManager(){
+        return sharedDataManager;
     }
 }

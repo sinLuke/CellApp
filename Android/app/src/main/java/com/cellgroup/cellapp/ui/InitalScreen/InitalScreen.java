@@ -19,12 +19,6 @@ public class InitalScreen extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_inital_screen);
-        AppDelegate.shared.applicationShouldRequireLogin(this);
-    }
-
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        AppDelegate.shared.handleActivityResult(requestCode, resultCode, data, this);
-
+        AppDelegate.shared.applicationDidlaunched(this);
     }
 }
