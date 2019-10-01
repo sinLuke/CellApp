@@ -49,7 +49,6 @@ class Login extends React.Component {
                 size="huge"
                 style={{
                   fontWeight: "normal",
-                  marginBottom: 0,
                   marginTop: "2em",
                   marginLeft: "2em",
                   marginBottom: "2em"

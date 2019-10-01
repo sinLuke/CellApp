@@ -1,24 +1,18 @@
 import React from "react";
-import { Table, Label } from "semantic-ui-react";
-import { setState } from "expect/build/jestMatchersObject";
+import { Table, Button, Icon, Image, Grids } from "semantic-ui-react";
 class TopicTable extends React.Component {
   constructor(props) {
     super(props);
-    this.state = {
-      topicList: [
-        { name: "topic0", id: "aaaaaa" },
-        { name: "topic1", id: "bbbbbb" },
-        { name: "topic2", id: "cccccc" }
-      ],
-      selected: "aaaaaa"
-    };
+    this.state = {};
   }
 
   cellClicked(id) {
-    this.setState({ selected: id });
+    console.log(this);
+    this.props.setSelected(id);
   }
 
   render() {
+    console.log(this.props);
     return (
       <Table celled>
         <Table.Header>
@@ -28,23 +22,34 @@ class TopicTable extends React.Component {
         </Table.Header>
 
         <Table.Body>
-          {this.state.topicList.map(topic => (
+          {this.props.topics.map(topic => (
             <Table.Row
               key={topic.id}
+              style={{ cursor: "pointer" }}
               onClick={() => this.cellClicked(topic.id)}
             >
               <Table.Cell
                 style={{
                   backgroundColor:
-                    this.state.selected == topic.id ? "#007affff" : "white",
-                  color: this.state.selected == topic.id ? "white" : "black"
+                    this.props.selected === topic.id ? "#007affff" : "white",
+                  color: this.props.selected === topic.id ? "white" : "black"
                 }}
               >
-                topic.name
+                {topic.TOPIC_NAME}
               </Table.Cell>
             </Table.Row>
           ))}
         </Table.Body>
+
+        <Table.Footer fullWidth>
+          <Table.Row>
+            <Table.HeaderCell colSpan="4">
+              <Button floated="left" icon labelPosition="right" size="small">
+                <Icon name="add" /> Add Topic
+              </Button>
+            </Table.HeaderCell>
+          </Table.Row>
+        </Table.Footer>
       </Table>
     );
   }
