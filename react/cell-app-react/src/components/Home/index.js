@@ -1,8 +1,6 @@
 import React from "react";
 import firebase from "firebase";
-import TopicTable from "./topicTable";
-import DocumentTable from "./documentTable";
-import StepTable from "./stepTable";
+import ItemTable from "./itemTable";
 import { Redirect } from "react-router-dom";
 import { Grid, Segment } from "semantic-ui-react";
 import HomeDetail from "./HomeDetail";
@@ -21,7 +19,6 @@ class Home extends React.Component {
     firebase.auth().onAuthStateChanged(
       function(user) {
         if (user) {
-          console.log("set user", user);
           this.setState({ user: user });
           if (user.email) {
             this.setState({
@@ -31,7 +28,6 @@ class Home extends React.Component {
             });
           }
         } else {
-          console.log("set user", null);
           this.setState({ user: null });
         }
       }.bind(this)
@@ -57,33 +53,73 @@ class Home extends React.Component {
     }
 
     if (!this.state.admin) {
-      return <div>{this.state.user.displayName} is not an administrator</div>;
+      return (
+        <div style={{ margin: "4em" }}>
+          <Segment>
+            {this.state.user.displayName} is not an administrator
+          </Segment>
+        </div>
+      );
     }
-
-    console.log(this.props);
 
     return (
       <div>
         <Grid container stackable columns="equal" verticalAlign="top">
           <Grid.Row stretched style={{ marginTop: "4em" }}>
             <Grid.Column>
-              <TopicTable
+              <ItemTable
                 selected={this.props.topicSelected}
                 setSelected={id => this.props.setSelected(0, id)}
-                topics={Object.values(this.props.lists.topicList)}
+                items={Object.values(this.props.lists.topicList).sort(function(
+                  a,
+                  b
+                ) {
+                  if (a.created < b.created) {
+                    return -1;
+                  }
+                  if (a.created > b.created) {
+                    return 1;
+                  }
+                  return 0;
+                })}
+                title={"Topics"}
+                add={() => this.props.add(0, null)}
+                loading={false}
+                type={0}
+                changed={this.props.changed}
+                isUploading={this.props.isUploading}
+                progress={this.props.progress}
               />
             </Grid.Column>
 
             {this.props.topicSelected ? (
               <Grid.Column>
-                <DocumentTable
+                <ItemTable
                   selected={this.props.documentSelected}
                   setSelected={id => this.props.setSelected(1, id)}
-                  docs={this.filterDocumentList(this.props.topicSelected)}
+                  items={this.filterDocumentList(this.props.topicSelected).sort(
+                    function(a, b) {
+                      if (a.created < b.created) {
+                        return -1;
+                      }
+                      if (a.created > b.created) {
+                        return 1;
+                      }
+                      return 0;
+                    }
+                  )}
                   title={
                     this.props.lists.topicList[this.props.topicSelected]
-                      .TOPIC_NAME
+                      ? this.props.lists.topicList[this.props.topicSelected]
+                          .TOPIC_NAME
+                      : "Docuemnt"
                   }
+                  add={parent => this.props.add(1, this.props.topicSelected)}
+                  loading={false}
+                  type={1}
+                  changed={this.props.changed}
+                  isUploading={this.props.isUploading}
+                  progress={this.props.progress}
                 />
               </Grid.Column>
             ) : (
@@ -92,14 +128,30 @@ class Home extends React.Component {
 
             {this.props.documentSelected ? (
               <Grid.Column>
-                <StepTable
+                <ItemTable
                   selected={this.props.stepSelected}
                   setSelected={id => this.props.setSelected(2, id)}
-                  steps={this.filterStepList(this.props.documentSelected)}
+                  items={this.filterStepList(this.props.documentSelected).sort(
+                    function(a, b) {
+                      if (a.PAGE_NUMBER < b.PAGE_NUMBER) {
+                        return -1;
+                      }
+                      if (a.PAGE_NUMBER > b.PAGE_NUMBER) {
+                        return 1;
+                      }
+                      return 0;
+                    }
+                  )}
                   title={
                     this.props.lists.documentList[this.props.documentSelected]
                       .DOCUMENT_NAME
                   }
+                  add={parent => this.props.add(2, this.props.documentSelected)}
+                  loading={false}
+                  type={2}
+                  changed={this.props.changed}
+                  isUploading={this.props.isUploading}
+                  progress={this.props.progress}
                 />
               </Grid.Column>
             ) : (
@@ -112,6 +164,13 @@ class Home extends React.Component {
                 documentSelected={this.props.documentSelected}
                 stepSelected={this.props.stepSelected}
                 lists={this.props.lists}
+                add={this.props.add}
+                filterStepList={this.filterStepList}
+                changed={this.props.changed}
+                setKeyValue={this.props.setKeyValue}
+                uploadHelpers={this.props.uploadHelpers}
+                isUploading={this.props.isUploading}
+                progress={this.props.progress}
               />
             </Grid.Column>
           </Grid.Row>
