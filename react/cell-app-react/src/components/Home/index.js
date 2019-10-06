@@ -24,7 +24,7 @@ class Home extends React.Component {
             this.setState({
               admin:
                 firebase.auth().currentUser.email === "yinluke@gmail.com" ||
-                firebase.auth().currentUser.email === "yinluke@gmail.com2"
+                firebase.auth().currentUser.email === "patelks2394@gmail.com"
             });
           }
         } else {
