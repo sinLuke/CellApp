@@ -11,15 +11,15 @@ import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 
-public class NetworkManager implements NetworkManagerCallBackDelegate {
+public class NetworkManager {
 
     private DocumentReference docRef;
     private Context context;
     private static FirebaseFirestore firebaseFirestore = FirebaseFirestore.getInstance();
-    private static NetworkManager shared;
-    private static DataManager data;
+    public static NetworkManager shared;
+    public DataManager data;
 
-    private NetworkManager (Context c, int version) {
+    private NetworkManager (Context c) {
         context = c.getApplicationContext();
         return;
     }
@@ -32,11 +32,9 @@ public class NetworkManager implements NetworkManagerCallBackDelegate {
                 if (pTask.isSuccessful()) {
                     DocumentSnapshot document = pTask.getResult();
                     if (document.exists()) {
-                        int db_version = FirestoreCoder.getDataFromDBVersion(document.getData());
-                        if (db_version != 0) {
-                            shared = new NetworkManager(c, db_version);
-                            shared.callBackCurrentOnlineDatabaseVersion(db_version);
-                        }
+
+                        shared = new NetworkManager(c);
+                        shared.callBackCurrentOnlineDatabaseVersion();
                     } else {
                         AppDelegate.shared.applicationDidReportException("Can't detect the online database version");
                     }
@@ -47,15 +45,19 @@ public class NetworkManager implements NetworkManagerCallBackDelegate {
         });
     }
 
-    public void callBackCurrentOnlineDatabaseVersion(int version) {
+    public void callBackCurrentOnlineDatabaseVersion() {
         downloadData();
     }
 
     public void downloadData(){
-
+        data = new DataManager();
     }
 
-    public void networkManagerDidDownloadData(){
-        AppDelegate.shared.DatabseDidCheckingUpdates(shared);
+    public void networkManagerDidDownloadData(String ErrorMessage){
+        if (ErrorMessage != null) {
+            AppDelegate.shared.applicationDidReportException(ErrorMessage);
+        } else {
+            AppDelegate.shared.DatabseDidCheckingUpdates(shared);
+        }
     }
 }

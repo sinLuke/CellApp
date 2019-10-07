@@ -2,6 +2,7 @@ package com.cellgroup.cellapp;
 
 import android.app.Activity;
 
+import android.content.Context;
 import android.content.Intent;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.Network;
@@ -19,18 +20,18 @@ public class AppDelegate {
 
     public static AppDelegate shared = new AppDelegate();
 
-    private Activity currentActivity;
+    private Context currentActivity;
     private NetworkManager sharedNetworkManager;
     private UserManager sharedUserManager;
 
     private void AppDelegate(){return;}
 
-    public void applicationDidlaunched(Activity activity) {
+    public void applicationDidlaunched(Context activity) {
         applicationShouldRequireLogin(activity);
     }
 
     //handling login
-    public void applicationShouldRequireLogin(Activity activity) {
+    public void applicationShouldRequireLogin(Context activity) {
 
         currentActivity = activity;
         FirebaseUser user = UserManager.getCurrentUser();
@@ -42,21 +43,21 @@ public class AppDelegate {
         }
     }
 
-    public void applicationDidFinisheLogin(Activity activity, UserManager pSharedUserManager) {
+    public void applicationDidFinisheLogin(Context activity, UserManager pSharedUserManager) {
         sharedUserManager = pSharedUserManager;
         applicationWillInitalizeUser(activity);
     }
 
     //Initialize User for first time login, receive UserManager callback
-    public void applicationWillInitalizeUser(Activity activity) {
+    public void applicationWillInitalizeUser(Context activity) {
         sharedUserManager.checkIfUserFirstLogin(activity);
     }
 
-    public void applicationDidInitializeUser(Activity activity, UserManager user) {
+    public void applicationDidInitializeUser(Context activity, UserManager user) {
         DatabseWillCheckingUpdates(activity);
     }
 
-    public void DatabseWillCheckingUpdates(Activity activity){
+    public void DatabseWillCheckingUpdates(Context activity){
         NetworkManager.getDataManager(activity);
     }
 

@@ -1,32 +1,50 @@
 package com.cellgroup.cellapp.network;
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
 
 import com.cellgroup.cellapp.AppDelegate;
 import com.cellgroup.cellapp.R;
+import com.cellgroup.cellapp.models.Doc;
+import com.cellgroup.cellapp.models.DocumentCompleteRate;
+import com.cellgroup.cellapp.models.Step;
+import com.cellgroup.cellapp.models.UserHistory;
 import com.cellgroup.cellapp.ui.login.InitializeUserActivity;
+import com.firebase.ui.auth.data.model.User;
 import com.google.android.gms.auth.api.signin.*;
 import com.google.android.gms.common.api.*;
 import com.google.android.gms.tasks.*;
 import com.google.firebase.auth.*;
-import com.google.firebase.firestore.DocumentReference;
-import com.google.firebase.firestore.DocumentSnapshot;
-import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.*;
+
+import java.lang.reflect.Array;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.Date;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.SortedList;
 
-public class UserManager {
+public class UserManager implements UserHistoryUpdateDelegate {
 
     private static FirebaseAuth mAuth = FirebaseAuth.getInstance();
     private static GoogleSignInOptions gso;
     private static GoogleSignInClient gsc;
     private static int RC_SIGN_IN = 0;
-    private static UserManager shared;
+    public static UserManager shared;
     private static FirebaseFirestore firebaseFirestore = FirebaseFirestore.getInstance();
 
     private int currentUserScopte = 0;
+    private Map<String, UserHistory> userHistory;
+    private Set<Doc> existDocs = new HashSet();
 
     private UserManager(int scope) {
         currentUserScopte = scope;
@@ -37,9 +55,53 @@ public class UserManager {
         return currentUser;
     }
 
-    public FirebaseUser getCurrentUserScope(){
-        FirebaseUser currentUser = mAuth.getCurrentUser();
-        return currentUser;
+    public int getCurrentUserScope(){
+        return currentUserScopte;
+    }
+
+    public Date getLastViewDateOfDocument(Doc doc) {
+        Date maxDate = null;
+        for (Step step: doc.steps.values()) {
+            UserHistory thisUserHistory = this.userHistory.get(step.id);
+            if (thisUserHistory != null) {
+                Date lastViewed = this.userHistory.get(step.id).lastViewd;
+                if (maxDate == null || lastViewed.after(maxDate)) {
+                    maxDate = lastViewed;
+                }
+            }
+        }
+        return maxDate;
+    }
+
+    public DocumentCompleteRate getCompleteRateOfDocument(Doc doc) {
+        int StepCount = 0;
+        int CompletionCount = 0;
+        for (Step step: doc.steps.values()) {
+            StepCount += 1;
+            UserHistory thisUserHistory = this.userHistory.get(step.id);
+            if (isStepCompleted(step)) {
+                CompletionCount += 1;
+            }
+        }
+
+        return new DocumentCompleteRate(StepCount, CompletionCount);
+    }
+
+    public boolean isStepCompleted(Step step) {
+        UserHistory thisUserHistory = this.userHistory.get(step.id);
+        if (thisUserHistory != null) {
+            return thisUserHistory.finished;
+        }
+        return false;
+    }
+
+    public boolean isDocumentCompleted(Doc doc){
+        DocumentCompleteRate rate = getCompleteRateOfDocument(doc);
+        return rate.isFinished();
+    }
+
+    public boolean isDocumentExistInUserHistory(Doc doc){
+        return existDocs.contains(doc);
     }
 
     public static void createUserWithEmailAndPassword(String email, String password, String comformedPassword, final UserManagerCallBackDelegate delegate, Activity activity) {
@@ -217,7 +279,7 @@ public class UserManager {
                 });
     }
 
-    public static void signOutCurrentUser(Activity activity){
+    public static void signOutCurrentUser(Context activity){
         FirebaseAuth.getInstance().signOut();
         AppDelegate.shared.applicationDidlaunched(activity);
     }
@@ -238,7 +300,7 @@ public class UserManager {
                 });
     }
 
-    public static void getUserManager(final FirebaseUser user, final Activity activity){
+    public static void getUserManager(final FirebaseUser user, final Context activity){
         DocumentReference userRef = firebaseFirestore.collection("Users").document(user.getUid());
         userRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
             @Override
@@ -248,12 +310,12 @@ public class UserManager {
                     if (document.exists()) {
                         int userScope = FirestoreCoder.getDataFromUser(document.getData());
                         shared = new UserManager(userScope);
-                        AppDelegate.shared.applicationDidFinisheLogin(activity, shared);
+                        shared.willUpdateUserHistory(activity, shared);
                     } else {
                         DocumentReference userRef = firebaseFirestore.collection("Users").document(user.getUid());
                         userRef.set(FirestoreCoder.setDataByUser(10));
                         shared = new UserManager(10);
-                        AppDelegate.shared.applicationDidFinisheLogin(activity, shared);
+                        shared.willUpdateUserHistory(activity, shared);
                     }
                 } else {
                     AppDelegate.shared.applicationDidReportException("Firestore get failed with " + pTask.getException());
@@ -262,9 +324,44 @@ public class UserManager {
         });
     }
 
+    public void willUpdateUserHistory(final Context activity, final UserHistoryUpdateDelegate delegate){
+        CollectionReference userHistoryRef = firebaseFirestore.collection("UserHistory");
+        userHistoryRef.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                if (task.isSuccessful()) {
+                    for (QueryDocumentSnapshot document : task.getResult()) {
+                        Map<String, Object> data = document.getData();
+                        String id = document.getId();
+                        try {
+                            UserHistory userHistory = new UserHistory(data, id);
+                            Step step = userHistory.step.get();
+                            if (step != null) {
+                                Doc doc = step.doc.get();
+                                existDocs.add(doc);
+                                UserManager.shared.userHistory.put(id, userHistory);
+                            }
+
+                        } catch (Exception e) {
+
+                        }
+                    }
+
+                    delegate.didUpdateUserHistory(activity);
+                } else {
+                    NetworkManager.shared.networkManagerDidDownloadData("Error When Downloading User Historys");
+                }
+            }
+        });
+    }
+
+    @Override
+    public void didUpdateUserHistory(Context activity) {
+        AppDelegate.shared.applicationDidFinisheLogin(activity, UserManager.shared);
+    }
 
     //handling user first login
-    public void checkIfUserFirstLogin(Activity activity) {
+    public void checkIfUserFirstLogin(Context activity) {
         Uri PhotoUrl = getCurrentUser().getPhotoUrl();
         if (getCurrentUser().getDisplayName() == "" || getCurrentUser().getPhotoUrl() == null) {
             Intent i = new Intent(activity, InitializeUserActivity.class);
@@ -274,9 +371,34 @@ public class UserManager {
         }
     }
 
-    public void checkIfUserEmailVarified(Activity activity) {
+    public void checkIfUserEmailVarified(final Context activity) {
         if (getCurrentUser().isEmailVerified()) {
             AppDelegate.shared.applicationDidInitializeUser(activity, this);
+        } else {
+            UserManager.getCurrentUser().sendEmailVerification().addOnCompleteListener(new OnCompleteListener<Void>() {
+                @Override
+                public void onComplete(@NonNull Task<Void> task) {
+                    if (task.isSuccessful()) {
+                        AlertDialog.Builder dlgAlert  = new AlertDialog.Builder(activity);
+                        dlgAlert.setMessage("A email has sent to your email address");
+                        dlgAlert.setTitle("Email Verification");
+                        dlgAlert.setPositiveButton("I receive the email",
+                                new DialogInterface.OnClickListener() {
+                                    public void onClick(DialogInterface dialog, int which) {
+                                        UserManager.shared.checkIfUserEmailVarified(activity);
+                                    }
+                                });
+                        dlgAlert.setNegativeButton("Sign out",
+                                new DialogInterface.OnClickListener() {
+                                    public void onClick(DialogInterface dialog, int which) {
+                                        AppDelegate.shared.applicationDidReportException("Email is not verified");
+                                    }
+                                });
+                        dlgAlert.setCancelable(true);
+                        dlgAlert.create().show();
+                    }
+                }
+            });
         }
     }
 

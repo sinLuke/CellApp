@@ -1,32 +1,25 @@
-package com.cellgroup.cellapp.ui.setting;
+package com.cellgroup.cellapp.ui.today.topic;
 
-import android.graphics.Color;
 import android.os.Bundle;
-
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.Nullable;
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
-
+import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModelProviders;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.cellgroup.cellapp.R;
-import com.cellgroup.cellapp.network.UserManager;
-import com.cellgroup.cellapp.ui.ViewHolderCallBackDelegate;
 
-import java.util.Arrays;
+public class TopicFragment extends Fragment {
 
-
-public class SettingFragment extends Fragment {
-
-    private RecyclerView settingRecyclerView;
-    private SettingAdapter adapter;
+    private RecyclerView todayRecyclerView;
+    private TopicAdapter adapter;
     private boolean mShouldRecieveUserInput;
 
     @Override
@@ -38,12 +31,12 @@ public class SettingFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
 
-        View v = inflater.inflate(R.layout.fragment_setting, container, false);
+        View v = inflater.inflate(R.layout.fragment_today, container, false);
 
-        settingRecyclerView = v.findViewById(R.id.setting_recycler_view);
+        todayRecyclerView = v.findViewById(R.id.today_recycler_view);
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getActivity());
 
-        settingRecyclerView.setLayoutManager(layoutManager);
+        todayRecyclerView.setLayoutManager(layoutManager);
         updateUI();
 
         return v;
@@ -58,8 +51,8 @@ public class SettingFragment extends Fragment {
 
     private void updateUI(){
         if (adapter == null) {
-            adapter = new SettingAdapter(getActivity());
-            settingRecyclerView.setAdapter(adapter);
+            adapter = new TopicAdapter(getActivity());
+            todayRecyclerView.setAdapter(adapter);
         } else {
             adapter.notifyDataSetChanged();
         }
