@@ -11,25 +11,19 @@ import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProviders;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.cellgroup.cellapp.R;
 
 public class TodayFragment extends Fragment {
 
-    private TodayViewModel mTodayViewModel;
+    private RecyclerView settingRecyclerView;
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
-        mTodayViewModel =
-                ViewModelProviders.of(this).get(TodayViewModel.class);
-        View root = inflater.inflate(R.layout.fragment_today, container, false);
-        final TextView textView = root.findViewById(R.id.text_today);
-        mTodayViewModel.getText().observe(this, new Observer<String>() {
-            @Override
-            public void onChanged(@Nullable String s) {
-                textView.setText(s);
-            }
-        });
-        return root;
+
+        View v = inflater.inflate(R.layout.fragment_today, container, false);
+
+        return v;
     }
 }

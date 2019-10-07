@@ -20,6 +20,8 @@ import com.cellgroup.cellapp.R;
 import com.cellgroup.cellapp.network.UserManager;
 import com.cellgroup.cellapp.ui.ViewHolderCallBackDelegate;
 
+import java.util.Arrays;
+
 
 public class SettingFragment extends Fragment {
 
@@ -107,7 +109,6 @@ public class SettingFragment extends Fragment {
             secondaryTextView = itemView.findViewById(R.id.setting_list_secondary_title);
             middleTextView = itemView.findViewById(R.id.setting_list_middle_title);
             disclosureImage = itemView.findViewById(R.id.image_disclosure);
-
             itemView.setOnClickListener(this);
         }
 
@@ -192,7 +193,7 @@ public class SettingFragment extends Fragment {
         @Override
         public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
             LayoutInflater layoutInflater = LayoutInflater.from(getActivity());
-            if (viewType == 0) {
+            if (viewType == 1) {
                 return new SettingItemHolder(layoutInflater, parent, this);
             } else {
                 return new SettingGroupTitleHolder(layoutInflater, parent, this);
@@ -202,9 +203,15 @@ public class SettingFragment extends Fragment {
 
         @Override
         public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
-            SettingItemHolder settingItemHolder = (SettingItemHolder) holder;
-            SettingGroupTitleHolder settingGroupTitleHolder = (SettingGroupTitleHolder) holder;
-            holder.bind(position);
+            if (holder.getClass().isAssignableFrom(SettingItemHolder.class)) {
+                SettingItemHolder settingItemHolder = (SettingItemHolder) holder;
+                settingItemHolder.bind(position);
+            } else if (holder.getClass().isAssignableFrom(SettingGroupTitleHolder.class)) {
+                SettingGroupTitleHolder settingGroupTitleHolder = (SettingGroupTitleHolder) holder;
+                settingGroupTitleHolder.bind(position);
+            }
+
+
             mShouldRecieveUserInput = true;
         }
 
@@ -215,7 +222,11 @@ public class SettingFragment extends Fragment {
 
         @Override
         public int getItemViewType(int position) {
-            return super.getItemViewType(position);
+            if( Arrays.asList(0, 5, 7).contains(position) ) {
+                return 0;
+            } else {
+                return 1;
+            }
         }
 
         @Override
