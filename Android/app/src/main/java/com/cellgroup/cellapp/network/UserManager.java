@@ -276,7 +276,7 @@ public class UserManager {
 
     public void checkIfUserEmailVarified(Activity activity) {
         if (getCurrentUser().isEmailVerified()) {
-            AppDelegate.shared.applicationDidFinisheInitializeUser(activity);
+            AppDelegate.shared.applicationDidInitializeUser(activity, this);
         }
     }
 

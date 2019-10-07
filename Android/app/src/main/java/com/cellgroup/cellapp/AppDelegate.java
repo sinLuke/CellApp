@@ -7,16 +7,9 @@ import android.database.sqlite.SQLiteDatabase;
 import android.widget.Toast;
 
 import com.cellgroup.cellapp.network.DataManager;
-
 import com.cellgroup.cellapp.network.UserManager;
 import com.cellgroup.cellapp.ui.login.LoginActivity;
-import com.firebase.ui.auth.AuthUI;
-import com.firebase.ui.auth.IdpResponse;
-import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.auth.FirebaseUser;
-
-import java.util.Arrays;
-import java.util.List;
 
 public class AppDelegate {
 
@@ -57,12 +50,16 @@ public class AppDelegate {
         sharedUserManager.checkIfUserFirstLogin(activity);
     }
 
-    public void applicationDidFinisheInitializeUser(Activity activity) {
+    public void applicationDidInitializeUser(Activity activity, UserManager user) {
+        DatabseWillCheckingUpdates(activity);
+    }
+
+    public void DatabseWillCheckingUpdates(Activity activity){
         DataManager.getDataManager(activity);
     }
 
     //receive DataManager callback
-    public void DatabseDidFinishCheckingUpdates(SQLiteDatabase db, DataManager pSharedDataManager){
+    public void DatabseDidCheckingUpdates(DataManager pSharedDataManager){
         applicationMoveToMainScreen();
         sharedDataManager = pSharedDataManager;
     }
