@@ -1,5 +1,5 @@
 package com.cellgroup.cellapp.network;
 
-public interface DataManagerCallBackDelegate {
+public interface NetworkManagerCallBackDelegate {
     void callBackCurrentOnlineDatabaseVersion(int version);
 }

@@ -4,9 +4,11 @@ import android.app.Activity;
 
 import android.content.Intent;
 import android.database.sqlite.SQLiteDatabase;
+import android.net.Network;
 import android.widget.Toast;
 
 import com.cellgroup.cellapp.network.DataManager;
+import com.cellgroup.cellapp.network.NetworkManager;
 import com.cellgroup.cellapp.network.UserManager;
 import com.cellgroup.cellapp.ui.login.LoginActivity;
 import com.google.firebase.auth.FirebaseUser;
@@ -18,7 +20,7 @@ public class AppDelegate {
     public static AppDelegate shared = new AppDelegate();
 
     private Activity currentActivity;
-    private DataManager sharedDataManager;
+    private NetworkManager sharedNetworkManager;
     private UserManager sharedUserManager;
 
     private void AppDelegate(){return;}
@@ -55,13 +57,13 @@ public class AppDelegate {
     }
 
     public void DatabseWillCheckingUpdates(Activity activity){
-        DataManager.getDataManager(activity);
+        NetworkManager.getDataManager(activity);
     }
 
     //receive DataManager callback
-    public void DatabseDidCheckingUpdates(DataManager pSharedDataManager){
+    public void DatabseDidCheckingUpdates(NetworkManager pSharedNetworkManager){
         applicationMoveToMainScreen();
-        sharedDataManager = pSharedDataManager;
+        sharedNetworkManager = pSharedNetworkManager;
     }
 
     //handling exception
@@ -81,7 +83,7 @@ public class AppDelegate {
         return sharedUserManager;
     }
 
-    public DataManager getSharedDataManager(){
-        return sharedDataManager;
+    public NetworkManager getSharedNetworkManager(){
+        return sharedNetworkManager;
     }
 }

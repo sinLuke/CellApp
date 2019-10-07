@@ -11,15 +11,13 @@ import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 
-public class NetworkManager implements DataManagerCallBackDelegate {
+public class NetworkManager implements NetworkManagerCallBackDelegate {
 
     private DocumentReference docRef;
     private Context context;
     private static FirebaseFirestore firebaseFirestore = FirebaseFirestore.getInstance();
     private static NetworkManager shared;
     private static DataManager data;
-
-    private List
 
     private NetworkManager (Context c, int version) {
         context = c.getApplicationContext();
@@ -36,7 +34,7 @@ public class NetworkManager implements DataManagerCallBackDelegate {
                     if (document.exists()) {
                         int db_version = FirestoreCoder.getDataFromDBVersion(document.getData());
                         if (db_version != 0) {
-                            shared = new DataManager(c, db_version);
+                            shared = new NetworkManager(c, db_version);
                             shared.callBackCurrentOnlineDatabaseVersion(db_version);
                         }
                     } else {
