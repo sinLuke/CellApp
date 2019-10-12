@@ -2,18 +2,20 @@ package com.cellgroup.cellapp.ui.today.topic;
 
 import android.content.Context;
 
+import android.content.Intent;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
 
+import com.cellgroup.cellapp.AppState;
 import com.cellgroup.cellapp.models.Doc;
 import com.cellgroup.cellapp.models.Topic;
-import com.cellgroup.cellapp.network.NetworkManager;
 import com.cellgroup.cellapp.ui.ViewHolderCallBackDelegate;
 import com.cellgroup.cellapp.ui.today.TodayGroupTitleHolder;
 import com.cellgroup.cellapp.ui.today.TodayItemHolder;
+import com.cellgroup.cellapp.ui.today.document.StepPagerActivity;
 
 import java.util.ArrayList;
-import java.util.List;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
@@ -29,7 +31,7 @@ public class TopicAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
 
     public TopicAdapter(Context activity){
         this.activity = activity;
-        this.topic = null;
+        this.topic = AppState.shared.getCurrentTopic();
     }
 
     public void prepareFragment(Topic topic){
@@ -52,7 +54,7 @@ public class TopicAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
     public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
         if (holder.getClass().isAssignableFrom(TodayItemHolder.class)) {
             TodayItemHolder todayItemHolder = (TodayItemHolder) holder;
-            Doc doc = new ArrayList<Doc>(topic.docs.values()).get(position);
+            Doc doc = new ArrayList<Doc>(topic.docs.values()).get(position - 1);
             todayItemHolder.bind(doc, null, getActivity());
 
         } else if (holder.getClass().isAssignableFrom(TodayGroupTitleHolder.class)) {
@@ -85,6 +87,10 @@ public class TopicAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
     public void holderDidCallSendingObject(RecyclerView.ViewHolder holder, Object object) {
         if (object.getClass().isAssignableFrom(Doc.class)) {
             Doc doc = (Doc) object;
+            AppState.shared.setCurrentDoc(doc);
+            Intent i = new Intent(getActivity(), StepPagerActivity.class);
+            Log.d("TopicAdapter", "holderDidCallSendingObject");
+            getActivity().startActivity(i);
         } else if (object.getClass().isAssignableFrom(Topic.class)) {
             Topic topic = (Topic) object;
         }

@@ -59,6 +59,10 @@
     //initial
     <string name="login_unsuccessful">Login Unsuccessful</string>
 
+    //Step
+    <string name="step_button_next">Next</string>
+    <string name="step_button_prev">Previous</string>
+
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>

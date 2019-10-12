@@ -2,13 +2,16 @@ package com.cellgroup.cellapp.ui.today;
 
 import android.content.Context;
 
+import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
 
+import com.cellgroup.cellapp.AppState;
 import com.cellgroup.cellapp.models.Doc;
 import com.cellgroup.cellapp.models.Topic;
 import com.cellgroup.cellapp.network.NetworkManager;
 import com.cellgroup.cellapp.ui.ViewHolderCallBackDelegate;
+import com.cellgroup.cellapp.ui.today.topic.TopicActivity;
 
 import java.util.List;
 
@@ -89,9 +92,14 @@ public class TodayAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
     public void holderDidCallSendingObject(RecyclerView.ViewHolder holder, Object object) {
         if (object.getClass().isAssignableFrom(Doc.class)) {
             Doc doc = (Doc) object;
+            AppState.shared.setCurrentDoc(doc);
         } else if (object.getClass().isAssignableFrom(Topic.class)) {
             Topic topic = (Topic) object;
+            AppState.shared.setCurrentTopic(topic);
+            Intent i = new Intent(getActivity(), TopicActivity.class);
+            getActivity().startActivity(i);
         }
+
         mShouldRecieveUserInput = false;
     }
 

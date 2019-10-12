@@ -1,5 +1,6 @@
 package com.cellgroup.cellapp.ui.today.topic;
 
+import android.content.Context;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -14,13 +15,20 @@ import androidx.lifecycle.ViewModelProviders;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.cellgroup.cellapp.AppState;
 import com.cellgroup.cellapp.R;
+import com.cellgroup.cellapp.ui.login.InitializeUserFragment;
 
 public class TopicFragment extends Fragment {
 
     private RecyclerView todayRecyclerView;
     private TopicAdapter adapter;
     private boolean mShouldRecieveUserInput;
+
+    public static TopicFragment newInstance(Context activity) {
+        TopicFragment fragment = new TopicFragment();
+        return fragment;
+    }
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -53,6 +61,7 @@ public class TopicFragment extends Fragment {
         if (adapter == null) {
             adapter = new TopicAdapter(getActivity());
             todayRecyclerView.setAdapter(adapter);
+            getActivity().setTitle(AppState.shared.getCurrentTopic().TOPIC_NAME);
         } else {
             adapter.notifyDataSetChanged();
         }
