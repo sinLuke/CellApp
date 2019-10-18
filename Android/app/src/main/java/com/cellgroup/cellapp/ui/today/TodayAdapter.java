@@ -9,8 +9,11 @@ import android.view.ViewGroup;
 import com.cellgroup.cellapp.AppState;
 import com.cellgroup.cellapp.models.Doc;
 import com.cellgroup.cellapp.models.Topic;
+import com.cellgroup.cellapp.network.DataManager;
 import com.cellgroup.cellapp.network.NetworkManager;
 import com.cellgroup.cellapp.ui.ViewHolderCallBackDelegate;
+import com.cellgroup.cellapp.ui.today.document.StepPagerActivity;
+import com.cellgroup.cellapp.ui.today.todayAllTopic.TodayAllTopicsTopicItemHolder;
 import com.cellgroup.cellapp.ui.today.topic.TopicActivity;
 
 import java.util.List;
@@ -30,18 +33,33 @@ public class TodayAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
 
     public TodayAdapter(Context activity){
         this.activity = activity;
-        this.topics = NetworkManager.shared.data.getAllTopics();
-        this.docs = NetworkManager.shared.data.getSortedDocuments(true);
+    }
+
+    public void onUpdateData(){
+        this.topics = DataManager.shared.getAllTopics();
+        this.docs = DataManager.shared.getSortedDocuments(true);
+    }
+
+    @Override
+    public void onAttachedToRecyclerView(@NonNull RecyclerView recyclerView) {
+        super.onAttachedToRecyclerView(recyclerView);
+        this.topics = DataManager.shared.getAllTopics();
+        this.docs = DataManager.shared.getSortedDocuments(true);
     }
 
     @NonNull
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         LayoutInflater layoutInflater = LayoutInflater.from(getActivity());
-        if (viewType == 1) {
-            return new TodayItemHolder(layoutInflater, parent, this);
-        } else {
-            return new TodayGroupTitleHolder(layoutInflater, parent, this);
+
+        switch (viewType) {
+            case 0:
+                return new TodayGroupTitleHolder(layoutInflater, parent, this);
+            case 1:
+                return new TodayItemHolder(layoutInflater, parent, this);
+            default:
+                return new TodayTopicContainerHolder(layoutInflater, parent, this, activity);
+
         }
 
     }
@@ -50,13 +68,8 @@ public class TodayAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
     public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
         if (holder.getClass().isAssignableFrom(TodayItemHolder.class)) {
             TodayItemHolder todayItemHolder = (TodayItemHolder) holder;
-            if (position < 1 + NetworkManager.shared.data.getTopicsCount()) {
-                Topic topic = topics.get(position - 1);
-                todayItemHolder.bind(null, topic, getActivity());
-            } else {
-                Doc doc = docs.get(position - (2 + topics.size()));
-                todayItemHolder.bind(doc, null, getActivity());
-            }
+            Doc doc = docs.get(position - 3);
+            todayItemHolder.bind(doc, getActivity());
 
         } else if (holder.getClass().isAssignableFrom(TodayGroupTitleHolder.class)) {
             TodayGroupTitleHolder todayGroupTitleHolder = (TodayGroupTitleHolder) holder;
@@ -65,19 +78,24 @@ public class TodayAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
             } else {
                 todayGroupTitleHolder.bind("Recently Viewed", getActivity());
             }
+        } else if (holder.getClass().isAssignableFrom(TodayTopicContainerHolder.class)) {
+            TodayTopicContainerHolder todayTopicContainerHolder = (TodayTopicContainerHolder) holder;
+            todayTopicContainerHolder.bind(activity);
         }
         mShouldRecieveUserInput = true;
     }
 
     @Override
     public int getItemCount() {
-        return topics.size() + docs.size() + 2;
+        return 1 + docs.size() + 2;
     }
 
     @Override
     public int getItemViewType(int position) {
-        if (position == 0 || position == 1 + NetworkManager.shared.data.getTopicsCount()) {
+        if (position == 0 || position == 2) {
             return 0;
+        } else if (position == 1){
+            return 2;
         } else {
             return 1;
         }
@@ -93,6 +111,8 @@ public class TodayAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
         if (object.getClass().isAssignableFrom(Doc.class)) {
             Doc doc = (Doc) object;
             AppState.shared.setCurrentDoc(doc);
+            Intent i = new Intent(getActivity(), StepPagerActivity.class);
+            getActivity().startActivity(i);
         } else if (object.getClass().isAssignableFrom(Topic.class)) {
             Topic topic = (Topic) object;
             AppState.shared.setCurrentTopic(topic);

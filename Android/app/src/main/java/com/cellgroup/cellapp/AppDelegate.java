@@ -62,9 +62,18 @@ public class AppDelegate {
     }
 
     //receive DataManager callback
-    public void DatabseDidCheckingUpdates(NetworkManager pSharedNetworkManager){
-        applicationMoveToMainScreen();
+    public void DatabseDidCheckingUpdates(NetworkManager pSharedNetworkManager, Context activity){
+        UserHistoryWillCheckingUpdates(activity);
         sharedNetworkManager = pSharedNetworkManager;
+    }
+
+    public void UserHistoryWillCheckingUpdates(Context activity){
+        UserManager.shared.willUpdateUserHistory(activity, UserManager.shared);
+    }
+
+    //receive DataManager callback
+    public void UserHistoryDidCheckingUpdates(){
+        applicationMoveToMainScreen();
     }
 
     //handling exception

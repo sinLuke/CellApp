@@ -46,7 +46,7 @@ public class AnimationItem {
 
         if (_STEP_ID != null) {
             String stepID = (String) _STEP_ID;
-            DataManager dataManager = NetworkManager.shared.data;
+            DataManager dataManager = DataManager.shared;
             Step step = dataManager.getStepByID(stepID);
             this.step = new WeakReference<Step>(step);
         } else {

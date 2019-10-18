@@ -24,6 +24,7 @@ public class Doc {
     public int available_scope;
     public Date created;
     public Map<String, Step> steps;
+    public Boolean hidden = false;
 
     public Doc(){
         defaultInit();
@@ -46,6 +47,9 @@ public class Doc {
     public Doc(Map<String, Object> data, String id) throws Exception {
         defaultInit();
         this.id = id;
+        if (data.get("hidden") != null) {
+            this.hidden = (Boolean) data.get("hidden") == true;
+        }
         Object _DIFFICULTY = data.get("DIFFICULTY");
         Object _DOCUMENT_NAME = data.get("DOCUMENT_NAME");
         Object _IMAGE_URL = data.get("IMAGE_URL");
@@ -77,7 +81,7 @@ public class Doc {
             String topicID = (String) _TOPIC_ID;
 
             Log.d("AddDOC", topicID);
-            DataManager dataManager = NetworkManager.shared.data;
+            DataManager dataManager = DataManager.shared;
             Topic topic = dataManager.getTopicByID(topicID);
             this.topic = new WeakReference<Topic>(topic);
         } else {

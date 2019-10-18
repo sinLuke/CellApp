@@ -19,11 +19,6 @@ class StepDetail extends React.Component {
   }
 
   render() {
-    const pageNumberOptions = [...new Array(this.props.stepCount).keys()].map(
-      function(i) {
-        return { key: i, text: `Page ${i + 1}`, value: i };
-      }
-    );
     const animationOptions = [
       { key: "auto", text: `Auto`, value: 1 },
       { key: "interactive", text: `Interactive`, value: 0 }
@@ -95,15 +90,24 @@ class StepDetail extends React.Component {
                 </Form.Group>
                 <Form.Group widths="equal">
                   <Form.Field
-                    options={pageNumberOptions}
-                    control={Select}
+                    control={Input}
                     label={{
                       children: "Page Number",
                       htmlFor: "step-detail-page-number-field"
                     }}
-                    value={this.props.step.PAGE_NUMBER}
+                    value={function() {
+                      if (isNaN(this.props.step.PAGE_NUMBER)) {
+                        return 0;
+                      } else {
+                        return this.props.step.PAGE_NUMBER + 1;
+                      }
+                    }.bind(this)()}
                     onChange={function(e, { value }) {
-                      this.props.setKeyValue("PAGE_NUMBER", value);
+                      var newPageNumber = parseInt(value);
+                      if (isNaN(newPageNumber)) {
+                        newPageNumber = 1;
+                      }
+                      this.props.setKeyValue("PAGE_NUMBER", newPageNumber - 1);
                     }.bind(this)}
                   />
                   <Form.Field

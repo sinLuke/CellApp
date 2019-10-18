@@ -5,8 +5,10 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
+import android.util.Log;
 
 import com.cellgroup.cellapp.AppDelegate;
+import com.cellgroup.cellapp.PrettyPrintingMap;
 import com.cellgroup.cellapp.R;
 import com.cellgroup.cellapp.models.Doc;
 import com.cellgroup.cellapp.models.DocumentCompleteRate;
@@ -24,6 +26,7 @@ import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -43,7 +46,7 @@ public class UserManager implements UserHistoryUpdateDelegate {
     private static FirebaseFirestore firebaseFirestore = FirebaseFirestore.getInstance();
 
     private int currentUserScopte = 0;
-    private Map<String, UserHistory> userHistory;
+    private Map<String, UserHistory> userHistory = new HashMap<>();
     private Set<Doc> existDocs = new HashSet();
 
     private UserManager(int scope) {
@@ -70,6 +73,7 @@ public class UserManager implements UserHistoryUpdateDelegate {
                 }
             }
         }
+        Log.d("getLastViewDateOfDocument", doc.DOCUMENT_NAME);
         return maxDate;
     }
 
@@ -87,9 +91,21 @@ public class UserManager implements UserHistoryUpdateDelegate {
         return new DocumentCompleteRate(StepCount, CompletionCount);
     }
 
+    public void setStepCompleted(UserHistory userHistory) {
+        Step userHistoryStep = userHistory.step.get();
+        if (userHistoryStep != null) {
+            this.userHistory.put(userHistoryStep.id, userHistory);
+            existDocs.add(userHistoryStep.doc.get());
+        }
+    }
+
     public boolean isStepCompleted(Step step) {
         UserHistory thisUserHistory = this.userHistory.get(step.id);
+        Log.d("isStepCompleted", "isStepCompleted");
+
+        Log.d("map", String.format("%s", (new PrettyPrintingMap(this.userHistory)).toString()));
         if (thisUserHistory != null) {
+            Log.d("isStepCompleted", "finished");
             return thisUserHistory.finished;
         }
         return false;
@@ -310,12 +326,12 @@ public class UserManager implements UserHistoryUpdateDelegate {
                     if (document.exists()) {
                         int userScope = FirestoreCoder.getDataFromUser(document.getData());
                         shared = new UserManager(userScope);
-                        shared.willUpdateUserHistory(activity, shared);
+                        shared.didUpdateUserHistory(activity);
                     } else {
                         DocumentReference userRef = firebaseFirestore.collection("Users").document(user.getUid());
                         userRef.set(FirestoreCoder.setDataByUser(10));
                         shared = new UserManager(10);
-                        shared.willUpdateUserHistory(activity, shared);
+                        shared.didUpdateUserHistory(activity);
                     }
                 } else {
                     AppDelegate.shared.applicationDidReportException("Firestore get failed with " + pTask.getException());
@@ -326,30 +342,36 @@ public class UserManager implements UserHistoryUpdateDelegate {
 
     public void willUpdateUserHistory(final Context activity, final UserHistoryUpdateDelegate delegate){
         CollectionReference userHistoryRef = firebaseFirestore.collection("UserHistory");
-        userHistoryRef.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+        Log.d("new User History", "start");
+        userHistoryRef.whereEqualTo("userID", UserManager.getCurrentUser().getUid()).get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
             @Override
             public void onComplete(@NonNull Task<QuerySnapshot> task) {
                 if (task.isSuccessful()) {
+                    Log.d("new User History", String.format("%d", task.getResult().size()));
                     for (QueryDocumentSnapshot document : task.getResult()) {
                         Map<String, Object> data = document.getData();
+                        Log.d("new User History", (String) data.get("stepID"));
                         String id = document.getId();
                         try {
                             UserHistory userHistory = new UserHistory(data, id);
                             Step step = userHistory.step.get();
                             if (step != null) {
+                                Log.d("ifStepNotNullAddUserHistory", step.id);
                                 Doc doc = step.doc.get();
                                 existDocs.add(doc);
-                                UserManager.shared.userHistory.put(id, userHistory);
+                                UserManager.shared.userHistory.put(step.id, userHistory);
+                            } else {
+                                Log.d("ifStepNotNullAddUserHistory", "Step is null");
                             }
 
                         } catch (Exception e) {
-
+                            Log.d("Catch", e.getLocalizedMessage());
                         }
                     }
 
-                    delegate.didUpdateUserHistory(activity);
+                    AppDelegate.shared.UserHistoryDidCheckingUpdates();
                 } else {
-                    NetworkManager.shared.networkManagerDidDownloadData("Error When Downloading User Historys");
+                    NetworkManager.shared.networkManagerDidDownloadData("Error When Downloading User Historys", activity);
                 }
             }
         });

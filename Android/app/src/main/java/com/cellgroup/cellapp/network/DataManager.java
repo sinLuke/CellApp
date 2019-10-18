@@ -1,5 +1,7 @@
 package com.cellgroup.cellapp.network;
 
+import android.content.Context;
+
 import com.cellgroup.cellapp.AppDelegate;
 import com.cellgroup.cellapp.models.*;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -28,35 +30,39 @@ public class DataManager {
     private Map<String, List<Doc>> documents;
     private static FirebaseFirestore firebaseFirestore = FirebaseFirestore.getInstance();
 
+    public static DataManager shared = new DataManager(null);
+
     private CollectionReference topicRef;
     private CollectionReference docRef;
     private CollectionReference stepRef;
     private CollectionReference animationBackgroundRef;
     private CollectionReference animationItemRef;
 
-    public DataManager(){
+    public DataManager(Context activity){
         topics = new HashMap<>();
         docs = new HashMap<>();
         steps = new HashMap<>();
         animationBackgrounds = new HashMap<>();
         animationItems = new HashMap<>();
-        downloadData();
+        if (activity != null) {
+            downloadData(activity);
+        }
     }
 
-    public void downloadData(){
+    public void downloadData(Context activity){
         topicRef = firebaseFirestore.collection("TOPIC");
         docRef = firebaseFirestore.collection("DOCUMENT");
         stepRef = firebaseFirestore.collection("STEP");
         animationBackgroundRef = firebaseFirestore.collection("ANIMATION_BACKGROUND");
         animationItemRef = firebaseFirestore.collection("ANIMATION_ITEM");
-        downloadTopics();
+        downloadTopics(activity);
     }
 
-    public void finishDownloads(){
-        NetworkManager.shared.networkManagerDidDownloadData(null);
+    public void finishDownloads(Context activity){
+        NetworkManager.shared.networkManagerDidDownloadData(null, activity);
     }
 
-    public void downloadTopics(){
+    public void downloadTopics(final Context activity){
         topicRef.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                     @Override
                     public void onComplete(@NonNull Task<QuerySnapshot> task) {
@@ -65,17 +71,19 @@ public class DataManager {
                                 Map<String, Object> data = document.getData();
                                 String id = document.getId();
                                 Topic topic = new Topic(data, id);
-                                DataManager.this.topics.put(id, topic);
+                                if (!topic.hidden) {
+                                    DataManager.this.topics.put(id, topic);
+                                }
                             }
-                            DataManager.this.downloadDocs();
+                            DataManager.this.downloadDocs(activity);
                         } else {
-                            NetworkManager.shared.networkManagerDidDownloadData("Error When Downloading Topics");
+                            NetworkManager.shared.networkManagerDidDownloadData("Error When Downloading Topics", activity);
                         }
                     }
                 });
     }
 
-    public void downloadDocs(){
+    public void downloadDocs(final Context activity){
         docRef.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
             @Override
             public void onComplete(@NonNull Task<QuerySnapshot> task) {
@@ -85,22 +93,25 @@ public class DataManager {
                         String id = document.getId();
                         try {
                             Doc doc = new Doc(data, id);
-                            DataManager.this.docs.put(id, doc);
-                            doc.topic.get().addDoc(doc);
+                            if (!doc.hidden) {
+                                DataManager.this.docs.put(id, doc);
+                                doc.topic.get().addDoc(doc);
+                            }
+
                         } catch (Exception e) {
 
                         }
 
                     }
-                    DataManager.this.downloadSteps();
+                    DataManager.this.downloadSteps(activity);
                 } else {
-                    NetworkManager.shared.networkManagerDidDownloadData("Error When Downloading Documents");
+                    NetworkManager.shared.networkManagerDidDownloadData("Error When Downloading Documents", activity);
                 }
             }
         });
     }
 
-    public void downloadSteps(){
+    public void downloadSteps(final Context activity){
         stepRef.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
             @Override
             public void onComplete(@NonNull Task<QuerySnapshot> task) {
@@ -110,21 +121,24 @@ public class DataManager {
                         String id = document.getId();
                         try {
                             Step step = new Step(data, id);
-                            DataManager.this.steps.put(id, step);
-                            step.doc.get().addStep(step);
+                            if (!step.hidden) {
+                                DataManager.this.steps.put(id, step);
+                                step.doc.get().addStep(step);
+                            }
+
                         } catch (Exception e) {
 
                         }
                     }
-                    DataManager.this.downloadAnimationBackgrounds();
+                    DataManager.this.downloadAnimationBackgrounds(activity);
                 } else {
-                    NetworkManager.shared.networkManagerDidDownloadData("Error When Downloading Steps");
+                    NetworkManager.shared.networkManagerDidDownloadData("Error When Downloading Steps", activity);
                 }
             }
         });
     }
 
-    public void downloadAnimationBackgrounds(){
+    public void downloadAnimationBackgrounds(final Context activity){
         animationBackgroundRef.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
             @Override
             public void onComplete(@NonNull Task<QuerySnapshot> task) {
@@ -141,15 +155,15 @@ public class DataManager {
                         }
 
                     }
-                    DataManager.this.downloadAnimationItems();
+                    DataManager.this.downloadAnimationItems(activity);
                 } else {
-                    NetworkManager.shared.networkManagerDidDownloadData("Error When Downloading Animation Backgrounds");
+                    NetworkManager.shared.networkManagerDidDownloadData("Error When Downloading Animation Backgrounds", activity);
                 }
             }
         });
     }
 
-    public void downloadAnimationItems(){
+    public void downloadAnimationItems(final Context activity){
         animationItemRef.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
             @Override
             public void onComplete(@NonNull Task<QuerySnapshot> task) {
@@ -166,9 +180,9 @@ public class DataManager {
 
                         }
                     }
-                    DataManager.this.finishDownloads();
+                    DataManager.this.finishDownloads(activity);
                 } else {
-                    NetworkManager.shared.networkManagerDidDownloadData("Error When Downloading Animation Items");
+                    NetworkManager.shared.networkManagerDidDownloadData("Error When Downloading Animation Items", activity);
                 }
             }
         });
@@ -223,12 +237,12 @@ public class DataManager {
             @Override
             public int compare(Doc lhs, Doc rhs) {
                 if (sortByTime) {
-                    return lhs.getLastViewDate().compareTo(rhs.getLastViewDate());
+                    return rhs.getLastViewDate().compareTo(lhs.getLastViewDate());
                 } else {
                     if (lhs.getCompletionRate().rate > rhs.getCompletionRate().rate) {
-                        return 1;
-                    } else if (lhs.getCompletionRate().rate < rhs.getCompletionRate().rate) {
                         return -1;
+                    } else if (lhs.getCompletionRate().rate < rhs.getCompletionRate().rate) {
+                        return 1;
                     } else {
                         return 0;
                     }

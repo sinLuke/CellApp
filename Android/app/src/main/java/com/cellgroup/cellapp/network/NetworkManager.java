@@ -17,14 +17,13 @@ public class NetworkManager {
     private Context context;
     private static FirebaseFirestore firebaseFirestore = FirebaseFirestore.getInstance();
     public static NetworkManager shared;
-    public DataManager data;
 
     private NetworkManager (Context c) {
         context = c.getApplicationContext();
         return;
     }
 
-    public static void getDataManager(final Context c){
+    public static void getDataManager(final Context activity){
         DocumentReference docRef = firebaseFirestore.collection("var").document("db_version");
         docRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
             @Override
@@ -33,8 +32,8 @@ public class NetworkManager {
                     DocumentSnapshot document = pTask.getResult();
                     if (document.exists()) {
 
-                        shared = new NetworkManager(c);
-                        shared.callBackCurrentOnlineDatabaseVersion();
+                        shared = new NetworkManager(activity);
+                        shared.callBackCurrentOnlineDatabaseVersion(activity);
                     } else {
                         AppDelegate.shared.applicationDidReportException("Can't detect the online database version");
                     }
@@ -45,19 +44,19 @@ public class NetworkManager {
         });
     }
 
-    public void callBackCurrentOnlineDatabaseVersion() {
-        downloadData();
+    public void callBackCurrentOnlineDatabaseVersion(Context activity) {
+        downloadData(activity);
     }
 
-    public void downloadData(){
-        data = new DataManager();
+    public void downloadData(Context activity){
+        DataManager.shared = new DataManager(activity);
     }
 
-    public void networkManagerDidDownloadData(String ErrorMessage){
+    public void networkManagerDidDownloadData(String ErrorMessage, Context activity){
         if (ErrorMessage != null) {
             AppDelegate.shared.applicationDidReportException(ErrorMessage);
         } else {
-            AppDelegate.shared.DatabseDidCheckingUpdates(shared);
+            AppDelegate.shared.DatabseDidCheckingUpdates(shared, activity);
         }
     }
 }

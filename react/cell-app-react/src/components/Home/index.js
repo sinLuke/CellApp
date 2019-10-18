@@ -75,6 +75,12 @@ class Home extends React.Component {
                   a,
                   b
                 ) {
+                  if (a.PAGE_NUMBER < b.PAGE_NUMBER) {
+                    return -1;
+                  }
+                  if (a.PAGE_NUMBER > b.PAGE_NUMBER) {
+                    return 1;
+                  }
                   if (a.created < b.created) {
                     return -1;
                   }
@@ -100,6 +106,12 @@ class Home extends React.Component {
                   setSelected={id => this.props.setSelected(1, id)}
                   items={this.filterDocumentList(this.props.topicSelected).sort(
                     function(a, b) {
+                      if (a.PAGE_NUMBER < b.PAGE_NUMBER) {
+                        return -1;
+                      }
+                      if (a.PAGE_NUMBER > b.PAGE_NUMBER) {
+                        return 1;
+                      }
                       if (a.created < b.created) {
                         return -1;
                       }

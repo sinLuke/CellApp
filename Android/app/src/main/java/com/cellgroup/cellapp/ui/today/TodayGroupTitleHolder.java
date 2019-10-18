@@ -17,7 +17,7 @@ public class TodayGroupTitleHolder extends RecyclerView.ViewHolder implements Vi
     private TextView groupTitle;
 
     public TodayGroupTitleHolder(LayoutInflater inflater, ViewGroup parent, ViewHolderCallBackDelegate pCallBackDelegate) {
-        super(inflater.inflate(R.layout.list_group_title_setting, parent, false));
+        super(inflater.inflate(R.layout.list_group_large_title, parent, false));
         groupTitle = itemView.findViewById(R.id.setting_group_title_text);
     }
 

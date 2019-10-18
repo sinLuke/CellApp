@@ -4,6 +4,7 @@ import android.app.AppComponentFactory;
 import android.os.Bundle;
 import android.os.PersistableBundle;
 import android.util.Log;
+import android.view.View;
 import android.widget.Button;
 
 import com.cellgroup.cellapp.AppState;
@@ -37,6 +38,8 @@ public class StepPagerActivity extends AppCompatActivity {
         setContentView(R.layout.activity_step_pager);
 
         viewPager = findViewById(R.id.step_view_page);
+        nextButton = findViewById(R.id.next_button);
+        prevButton = findViewById(R.id.prev_button);
         steps = new ArrayList<>(AppState.shared.getCurrentDoc().steps.values());
 
         setTitle(AppState.shared.getCurrentDoc().DOCUMENT_NAME);
@@ -69,7 +72,51 @@ public class StepPagerActivity extends AppCompatActivity {
             }
         });
 
+        viewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+            @Override
+            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+                AppState.shared.setCurrentStep(steps.get(position));
+            }
+
+            @Override
+            public void onPageSelected(int position) {
+
+            }
+
+            @Override
+            public void onPageScrollStateChanged(int state) {
+
+            }
+        });
+
+        nextButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                int newPage = viewPager.getCurrentItem() + 1;
+                if (newPage >= 0 && newPage < steps.size()) {
+                    viewPager.setCurrentItem(newPage);
+                }
+            }
+        });
+
+        prevButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                int newPage = viewPager.getCurrentItem() - 1;
+                if (newPage >= 0 && newPage < steps.size()) {
+                    viewPager.setCurrentItem(newPage);
+                }
+            }
+        });
+
+        Step currentStep = AppState.shared.getCurrentStep();
+        if (currentStep != null) {
+            for (int i = 0; i < steps.size(); i ++) {
+                Step s = steps.get(i);
+                if (s.id == currentStep.id) {
+                    viewPager.setCurrentItem(i);
+                }
+            }
+        }
     }
-
-
 }

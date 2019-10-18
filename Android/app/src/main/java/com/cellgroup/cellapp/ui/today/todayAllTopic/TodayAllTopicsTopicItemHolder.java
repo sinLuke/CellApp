@@ -1,4 +1,4 @@
-package com.cellgroup.cellapp.ui.today;
+package com.cellgroup.cellapp.ui.today.todayAllTopic;
 
 import android.content.Context;
 import android.graphics.Color;
@@ -10,52 +10,50 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.cellgroup.cellapp.R;
-import com.cellgroup.cellapp.models.Doc;
 import com.cellgroup.cellapp.models.Topic;
-import com.cellgroup.cellapp.network.UserManager;
 import com.cellgroup.cellapp.ui.ViewHolderCallBackDelegate;
 import com.squareup.picasso.Callback;
 import com.squareup.picasso.Picasso;
 
 import java.lang.ref.WeakReference;
+import java.util.List;
 
+import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-public class TodayItemHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
+public class TodayAllTopicsTopicItemHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
     private TextView mainTextView;
     private TextView secondaryTextView;
-    private ImageView documentImage;
+    private ImageView topicImage;
     private ViewHolderCallBackDelegate callBackDelegate;
 
-    private WeakReference<Doc> doc;
+    private WeakReference<Topic> topic;
 
-    public TodayItemHolder(LayoutInflater inflater, ViewGroup parent, ViewHolderCallBackDelegate pCallBackDelegate) {
-        super(inflater.inflate(R.layout.cell_today_recent_document_item, parent, false));
+    private int type = 0;
+
+    public TodayAllTopicsTopicItemHolder(LayoutInflater inflater, ViewGroup parent, ViewHolderCallBackDelegate pCallBackDelegate) {
+        super(inflater.inflate(R.layout.list_today_topic_item, parent, false));
         callBackDelegate = pCallBackDelegate;
 
-        mainTextView = itemView.findViewById(R.id.today_recent_doicument_main_title);
-        secondaryTextView = itemView.findViewById(R.id.today_recent_doicument_secondary_title);
-        documentImage = itemView.findViewById(R.id.image_today_recent_document);
+        mainTextView = itemView.findViewById(R.id.today_topic_item_main_title);
+        secondaryTextView = itemView.findViewById(R.id.today_topic_item_secondary_title);
+        topicImage = itemView.findViewById(R.id.image_today_topic_item);
+
         itemView.setOnClickListener(this);
+
     }
 
-    public void bind(Doc doc, Context activity) {
-        mainTextView.setText(activity.getText(R.string.setting_change_display_name));
-        secondaryTextView.setText(UserManager.getCurrentUser().getDisplayName());
-        itemView.setBackgroundColor(Color.TRANSPARENT);
-        if (doc != null) {
-            this.doc = new WeakReference<>(doc);
-            mainTextView.setText(doc.DOCUMENT_NAME);
-            secondaryTextView.setText(String.format("%d Steps", doc.steps.size()));
-        }
-
-        if (doc.IMAGE_URL != null) {
+    public void bind(Topic pTopic, Context activity) {
+        this.topic = new WeakReference<>(pTopic);
+        mainTextView.setText(pTopic.TOPIC_NAME);
+        secondaryTextView.setText(String.format("%d Documents", pTopic.docs.size()));
+        if (pTopic.IMAGE_URL != null) {
             Picasso
                     .get()
-                    .load(doc.IMAGE_URL.toString())
+                    .load(pTopic.IMAGE_URL.toString())
                     .placeholder(R.drawable.user_placeholder)
-                    .error(R.drawable.user_placeholder_error).into(documentImage, new Callback() {
+                    .error(R.drawable.user_placeholder_error).into(topicImage, new Callback() {
                 @Override
                 public void onSuccess() {
                 }
@@ -82,8 +80,8 @@ public class TodayItemHolder extends RecyclerView.ViewHolder implements View.OnC
     public void onClick(View v) {
         if (callBackDelegate.holderShouldRecieveUserInput()) {
             itemView.setBackgroundColor(Color.GRAY);
-            if (this.doc != null && this.doc.get() != null) {
-                callBackDelegate.holderDidCallSendingObject(this, this.doc.get());
+            if (this.topic != null && this.topic.get() != null) {
+                callBackDelegate.holderDidCallSendingObject(this, this.topic.get());
             }
         }
     }

@@ -13,6 +13,7 @@ public class Topic {
     public String TOPIC_NAME;
     public Date created;
     public Map<String, Doc> docs;
+    public Boolean hidden = false;
 
     public Topic(){
         defaultInit();
@@ -22,6 +23,10 @@ public class Topic {
         defaultInit();
 
         this.id = id;
+
+        if (data.get("hidden") != null) {
+            this.hidden = (Boolean) data.get("hidden") == true;
+        }
 
         Object _TOPIC_NAME = data.get("TOPIC_NAME");
         Object _IMAGE_URL = data.get("IMAGE_URL");

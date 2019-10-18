@@ -80,15 +80,38 @@ class DocumentDetail extends React.Component {
                     id="document-detail-difficulty-field"
                     control={Input}
                     label="Difficulty"
-                    value={this.props.document.DIFFICULTY}
-                    onChange={function(e, { value }) {
-                      if (Number.isInteger(value)) {
-                        if (value < 1) {
-                          this.props.setKeyValue("DIFFICULTY", 0);
-                        } else {
-                          this.props.setKeyValue("DIFFICULTY", value);
-                        }
+                    value={function() {
+                      if (isNaN(this.props.document.DIFFICULTY)) {
+                        return 0;
+                      } else {
+                        return this.props.document.DIFFICULTY;
                       }
+                    }.bind(this)()}
+                    onChange={function(e, { value }) {
+                      var difficulty = parseInt(value);
+                      if (isNaN(difficulty) || difficulty < 1) {
+                        difficulty = 0;
+                      }
+                      this.props.setKeyValue("DIFFICULTY", difficulty);
+                    }.bind(this)}
+                  />
+                  <Form.Field
+                    id="document-detail-pagenumber-field"
+                    control={Input}
+                    label="Page Number"
+                    value={function() {
+                      if (isNaN(this.props.document.PAGE_NUMBER)) {
+                        return 0;
+                      } else {
+                        return this.props.document.PAGE_NUMBER + 1;
+                      }
+                    }.bind(this)()}
+                    onChange={function(e, { value }) {
+                      var pageNumber = parseInt(value);
+                      if (isNaN(pageNumber) || pageNumber < 0) {
+                        pageNumber = 1;
+                      }
+                      this.props.setKeyValue("PAGE_NUMBER", pageNumber - 1);
                     }.bind(this)}
                   />
                 </Form.Group>

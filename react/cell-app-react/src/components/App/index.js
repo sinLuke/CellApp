@@ -226,45 +226,6 @@ class App extends React.Component {
         //get copy of the whole stepList
         var _stepList = this.state.stepList;
 
-        //swap pagenumber for target step
-        if (key === "PAGE_NUMBER") {
-          Object.values(_stepList).forEach(
-            function(step) {
-              if (step.DOCUMENT_ID === parent && step.PAGE_NUMBER === value) {
-                // same object
-                if (step.id == document) {
-                  return;
-                }
-
-                //swap the pageNUmber
-                var targetValue = _stepList[document].PAGE_NUMBER;
-                _stepList[step.id].PAGE_NUMBER = targetValue;
-                _stepList[document].PAGE_NUMBER = value;
-
-                Promise.all([
-                  this.db
-                    .collection("STEP")
-                    .doc(step.id)
-                    .update({ PAGE_NUMBER: targetValue }),
-                  this.db
-                    .collection("STEP")
-                    .doc(document)
-                    .update({ PAGE_NUMBER: value })
-                ]).then(
-                  function() {
-                    //set the updated stepList back
-                    this.setState({
-                      stepList: _stepList
-                    });
-                  }.bind(this)
-                );
-                return;
-              }
-            }.bind(this)
-          );
-          return;
-        }
-
         var _document = this.state.document;
         var _topic = this.state.topic;
         //If change the document id, make sure it's exist
@@ -423,18 +384,24 @@ class App extends React.Component {
       function([topicSnapshots, documentSnapshots, stepSnapshots]) {
         topicSnapshots.forEach(doc => {
           var thisDoc = doc.data();
-          thisDoc.id = doc.id;
-          topicList[doc.id] = thisDoc;
+          if (thisDoc.hidden != true) {
+            thisDoc.id = doc.id;
+            topicList[doc.id] = thisDoc;
+          }
         });
         documentSnapshots.forEach(doc => {
           var thisDoc = doc.data();
-          thisDoc.id = doc.id;
-          documentList[doc.id] = thisDoc;
+          if (thisDoc.hidden != true) {
+            thisDoc.id = doc.id;
+            documentList[doc.id] = thisDoc;
+          }
         });
         stepSnapshots.forEach(doc => {
           var thisDoc = doc.data();
-          thisDoc.id = doc.id;
-          stepList[doc.id] = thisDoc;
+          if (thisDoc.hidden != true) {
+            thisDoc.id = doc.id;
+            stepList[doc.id] = thisDoc;
+          }
         });
 
         this.setState({

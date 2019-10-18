@@ -51,6 +51,27 @@ class TopicDetail extends React.Component {
                     }.bind(this)}
                   />
                 </Form.Group>
+                <Form.Group widths="equal">
+                  <Form.Field
+                    id="step-detail-page-number-field"
+                    control={Input}
+                    label="Page Number"
+                    value={function() {
+                      if (isNaN(this.props.topic.PAGE_NUMBER)) {
+                        return 0;
+                      } else {
+                        return this.props.topic.PAGE_NUMBER + 1;
+                      }
+                    }.bind(this)()}
+                    onChange={function(e, { value }) {
+                      var pageNumber = parseInt(value);
+                      if (isNaN(pageNumber) || pageNumber < 0) {
+                        pageNumber = 1;
+                      }
+                      this.props.setKeyValue("PAGE_NUMBER", pageNumber - 1);
+                    }.bind(this)}
+                  />
+                </Form.Group>
                 <Form.Field label="Topic Image"></Form.Field>
                 {this.props.topic.IMAGE_URL ? (
                   <Segment>

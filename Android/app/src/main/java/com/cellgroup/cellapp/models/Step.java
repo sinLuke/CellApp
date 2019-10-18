@@ -18,6 +18,7 @@ public class Step {
     public URL IMAGE_URL;
     public int PAGE_NUMBER;
     public String TEXT;
+    public Boolean hidden = false;
 
     public Date created;
 
@@ -35,6 +36,9 @@ public class Step {
         defaultInit();
 
         this.id = id;
+        if (data.get("hidden") != null) {
+            this.hidden = (Boolean) data.get("hidden") == true;
+        }
 
         Object _AUTO_ANIMATION = data.get("AUTO_ANIMATION");
         Object _DOCUMENT_ID = data.get("DOCUMENT_ID");
@@ -50,7 +54,7 @@ public class Step {
 
         if (_DOCUMENT_ID != null) {
             String docID = (String) _DOCUMENT_ID;
-            DataManager dataManager = NetworkManager.shared.data;
+            DataManager dataManager = DataManager.shared;
             Doc doc = dataManager.getDocumentByID(docID);
             this.doc = this.doc = new WeakReference<Doc>(doc);;
         } else {
