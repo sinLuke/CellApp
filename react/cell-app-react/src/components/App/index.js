@@ -6,6 +6,8 @@ import Navigation from "../Navigation";
 import LoginPage from "../Login";
 import HomePage from "../Home";
 import * as ROUTES from "../../constants/routes";
+import { Button, Grid, GridColumn } from "semantic-ui-react";
+import { deflate } from "zlib";
 class App extends React.Component {
   constructor(prop) {
     super(prop);
@@ -13,18 +15,23 @@ class App extends React.Component {
       topic: null,
       document: null,
       step: null,
+      animationItem: null,
       topicList: {},
       stepList: {},
       documentList: {},
+      animationItemList: {},
       currentVersion: null,
       changed: new Set(),
       isUploading: null,
-      progress: 0
+      progress: 0,
+      editAnimation: false
     };
 
     this.setSelected = this.setSelected.bind(this);
     this.load = this.load.bind(this);
     this.add = this.add.bind(this);
+    this.update = this.update.bind(this);
+    this.updateAll = this.updateAll.bind(this);
     this.setKeyValue = this.setKeyValue.bind(this);
     this.uploadHelpers = {
       handleUploadStart: this.handleUploadStart.bind(this),
@@ -83,12 +90,23 @@ class App extends React.Component {
                   changed: _changed
                 });
               }
-            default:
+            case 2:
               if (this.state.stepList[id]) {
                 var _stepList = this.state.stepList;
                 _stepList[id].IMAGE_URL = url;
                 this.setState({
                   stepList: _stepList,
+                  progress: 100,
+                  isUploading: null,
+                  changed: _changed
+                });
+              }
+            default:
+              if (this.state.animationItemList[id]) {
+                var _animationItemList = this.state.animationItemList;
+                _animationItemList[id].IMAGE_URL = url;
+                this.setState({
+                  animationItemList: _animationItemList,
                   progress: 100,
                   isUploading: null,
                   changed: _changed
@@ -103,11 +121,19 @@ class App extends React.Component {
     switch (collection) {
       case 0:
         if (Object.keys(this.state.topicList).includes(id)) {
-          console.log(1);
-          this.setState({ topic: id, document: null, step: null });
+          this.setState({
+            topic: id,
+            document: null,
+            step: null,
+            animationItem: null
+          });
         } else {
-          console.log(2);
-          this.setState({ topic: null, document: null, step: null });
+          this.setState({
+            topic: null,
+            document: null,
+            step: null,
+            animationItem: null
+          });
         }
 
         break;
@@ -115,35 +141,58 @@ class App extends React.Component {
         if (Object.keys(this.state.documentList).includes(id)) {
           var topicID = this.state.documentList[id].TOPIC_ID;
           if (Object.keys(this.state.topicList).includes(topicID)) {
-            console.log(3);
-            this.setState({ topic: topicID, document: id, step: null });
+            this.setState({
+              topic: topicID,
+              document: id,
+              step: null,
+              animationItem: null
+            });
           } else {
-            console.log(4);
-            this.setState({ topic: null, document: null, step: null });
+            this.setState({
+              topic: null,
+              document: null,
+              step: null,
+              animationItem: null
+            });
           }
         } else {
-          console.log(5);
-          this.setState({ document: null, step: null });
+          this.setState({ document: null, step: null, animationItem: null });
         }
         break;
-      default:
+      case 2:
         if (Object.keys(this.state.stepList).includes(id)) {
           var documentID = this.state.stepList[id].DOCUMENT_ID;
           if (Object.keys(this.state.documentList).includes(documentID)) {
             var topicID = this.state.documentList[documentID].TOPIC_ID;
             if (Object.keys(this.state.topicList).includes(topicID)) {
-              this.setState({ topic: topicID, document: documentID, step: id });
+              this.setState({
+                topic: topicID,
+                document: documentID,
+                step: id,
+                animationItem: null
+              });
             } else {
-              console.log(6);
-              this.setState({ topic: null, document: null, step: null });
+              this.setState({
+                topic: null,
+                document: null,
+                step: null,
+                animationItem: null
+              });
             }
           } else {
-            console.log(7);
-            this.setState({ document: null, step: null });
+            this.setState({ document: null, step: null, animationItem: null });
           }
         } else {
-          console.log(8, this.state.stepList, id);
-          this.setState({ step: null });
+          this.setState({ step: null, animationItem: null });
+        }
+      default:
+        if (Object.keys(this.state.animationItemList).includes(id)) {
+          var stepID = this.state.animationItemList[id].STEP_ID;
+          if (stepID === this.state.step) {
+            this.setState({ animationItem: id });
+          }
+        } else {
+          this.setState({ animationItem: null });
         }
     }
   }
@@ -151,8 +200,6 @@ class App extends React.Component {
   setKeyValue(collection, document, parent, key, value) {
     var collectionName = "TOPIC";
     var _changed = this.state.changed;
-
-    console.log("setKeyValue", this.state.stepList[document]);
 
     switch (collection) {
       case 0:
@@ -195,9 +242,7 @@ class App extends React.Component {
           if (!this.state.topicList[value]) {
             return;
           }
-          console.log("_topic 1", _topic, value);
           _topic = value;
-          console.log("_topic 2", _topic, value);
         }
 
         //change the key-value
@@ -206,8 +251,6 @@ class App extends React.Component {
         //add id to changed list
         _changed.add(document);
 
-        console.log("_topic 3", _topic, key, value);
-
         this.setState({
           documentList: _documentList,
           changed: _changed,
@@ -215,7 +258,7 @@ class App extends React.Component {
         });
 
         break;
-      default:
+      case 2:
         collectionName = "STEP";
 
         //this step dosen't exist
@@ -255,7 +298,22 @@ class App extends React.Component {
           topic: _topic
         });
 
-        console.log("setKeyValue", this.state.stepList[document]);
+      default:
+        //this animation item dosen't exist
+        if (!this.state.animationItemList[document]) {
+          return;
+        }
+        //get copy of the whole animationItemList
+        var _animationItemList = this.state.animationItemList;
+        //change the key-value
+        _animationItemList[document][key] = value;
+        //add id to changed list
+        _changed.add(document);
+
+        this.setState({
+          animationItemList: _animationItemList,
+          changed: _changed
+        });
     }
   }
 
@@ -283,7 +341,7 @@ class App extends React.Component {
           created: new Date().getTime()
         };
         break;
-      default:
+      case 2:
         collectionName = "STEP";
         item = {
           AUTO_ANIMATION: 1,
@@ -296,6 +354,18 @@ class App extends React.Component {
           ) {
             return step.DOCUMENT_ID === parent;
           }).length,
+          created: new Date().getTime()
+        };
+      default:
+        collectionName = "ANIMATION_ITEM";
+        item = {
+          DESCRIPTION: "New Animation Item",
+          END_POSITION_X: 0.0,
+          END_POSITION_Y: 0.0,
+          START_POSITION_X: 0.0,
+          START_POSITION_Y: 0.0,
+          IMAGE_URL: null,
+          STEP_ID: parent,
           created: new Date().getTime()
         };
     }
@@ -323,17 +393,32 @@ class App extends React.Component {
                 documentList: _documentList
               });
               break;
-            default:
+            case 2:
               var _stepList = this.state.stepList;
               _stepList[docRef.id] = item;
               this.setState({ step: docRef.id, stepList: _stepList });
+            default:
+              var _animationItemList = this.state.animationItemList;
+              _animationItemList[docRef.id] = item;
+              this.setState({
+                animationItem: docRef.id,
+                animationItemList: _animationItemList
+              });
           }
         }.bind(this)
       );
   }
 
+  updateAll() {
+    this.state.changed.forEach(document => {
+      this.update(0, document);
+      this.update(1, document);
+      this.update(2, document);
+      this.update(3, document);
+    });
+  }
+
   update(collection, document) {
-    console.trace("update");
     var collectionName = "TOPIC";
     var item = null;
     switch (collection) {
@@ -345,11 +430,14 @@ class App extends React.Component {
         collectionName = "DOCUMENT";
         item = this.state.documentList[document];
         break;
-      default:
+      case 2:
         collectionName = "STEP";
         item = this.state.stepList[document];
+      default:
+        collectionName = "ANIMATION_ITEM";
+        item = this.state.stepList[document];
     }
-    console.trace("update", item);
+
     if (item) {
       this.db
         .collection(collectionName)
@@ -371,17 +459,23 @@ class App extends React.Component {
   }
 
   load() {
-    console.log("load");
     var topicList = {};
     var stepList = {};
     var documentList = {};
+    var animationItemList = {};
 
     Promise.all([
       this.db.collection("TOPIC").get(),
       this.db.collection("DOCUMENT").get(),
-      this.db.collection("STEP").get()
+      this.db.collection("STEP").get(),
+      this.db.collection("ANIMATION_ITEM").get()
     ]).then(
-      function([topicSnapshots, documentSnapshots, stepSnapshots]) {
+      function([
+        topicSnapshots,
+        documentSnapshots,
+        stepSnapshots,
+        animationItemSnapshots
+      ]) {
         topicSnapshots.forEach(doc => {
           var thisDoc = doc.data();
           if (thisDoc.hidden != true) {
@@ -403,11 +497,19 @@ class App extends React.Component {
             stepList[doc.id] = thisDoc;
           }
         });
+        animationItemSnapshots.forEach(doc => {
+          var thisDoc = doc.data();
+          if (thisDoc.hidden != true) {
+            thisDoc.id = doc.id;
+            animationItemList[doc.id] = thisDoc;
+          }
+        });
 
         this.setState({
           topicList: topicList,
           documentList: documentList,
           stepList: stepList,
+          animationItemList: animationItemList,
           changed: new Set()
         });
       }.bind(this)
@@ -415,34 +517,94 @@ class App extends React.Component {
   }
 
   render() {
+    this.props.window.onbeforeunload = function(e) {
+      if (this.state.changed.size != 0) {
+        console.log("onbeforeunload");
+
+        // Cancel the event
+        e.preventDefault();
+
+        // Chrome requires returnValue to be set
+        e.returnValue = "Really want to quit?";
+      }
+    }.bind(this);
+    var imageURL =
+      "https://firebasestorage.googleapis.com/v0/b/cell-app.appspot.com/o/bkimg?alt=media&token=4ea31dfb-89c0-4738-913f-066ab55c21f1";
     return (
       <Router>
-        <div>
-          <Navigation />
+        <div
+          style={{
+            backgroundColor: this.state.editAnimation ? "black" : "white"
+          }}
+        >
+          <Navigation editAnimation={this.state.editAnimation} />
           <hr />
           <Route exact path={ROUTES.LOGIN} render={props => <LoginPage />} />
           <Route
             path={ROUTES.HOME}
             render={props => (
-              <HomePage
-                setSelected={this.setSelected}
-                topicSelected={this.state.topic}
-                documentSelected={this.state.document}
-                stepSelected={this.state.step}
-                lists={{
-                  topicList: this.state.topicList,
-                  documentList: this.state.documentList,
-                  stepList: this.state.stepList
-                }}
-                update={this.update}
-                load={this.load}
-                add={this.add}
-                setKeyValue={this.setKeyValue}
-                changed={this.state.changed}
-                uploadHelpers={this.uploadHelpers}
-                isUploading={this.state.isUploading}
-                progress={this.state.progress}
-              />
+              <div>
+                {!this.state.editAnimation ? (
+                  <Button
+                    primary
+                    disabled={this.state.changed.size === 0}
+                    onClick={this.updateAll}
+                    style={{ marginTop: "4em", marginLeft: "16px" }}
+                  >
+                    {this.state.changed.size} Change(s), Save All
+                  </Button>
+                ) : (
+                  " "
+                )}
+
+                {this.state.editAnimation ? (
+                  <Button
+                    disabled={!this.state.step}
+                    onClick={() => {
+                      this.setState({ editAnimation: false });
+                    }}
+                    style={{ marginTop: "4em", marginLeft: "16px" }}
+                  >
+                    Back
+                  </Button>
+                ) : (
+                  <Button
+                    primary
+                    disabled={!this.state.step}
+                    onClick={() => {
+                      this.setState({ editAnimation: true });
+                    }}
+                    style={{ marginTop: "4em" }}
+                  >
+                    Edit Animation
+                  </Button>
+                )}
+
+                <HomePage
+                  window={this.props.window}
+                  style={{ backgroundImage: `url(${imageURL})` }}
+                  editAnimation={this.state.editAnimation}
+                  setSelected={this.setSelected}
+                  topicSelected={this.state.topic}
+                  documentSelected={this.state.document}
+                  stepSelected={this.state.step}
+                  animationItemSelected={this.state.animationItem}
+                  lists={{
+                    topicList: this.state.topicList,
+                    documentList: this.state.documentList,
+                    stepList: this.state.stepList,
+                    animationItemList: this.state.animationItemList
+                  }}
+                  update={this.update}
+                  load={this.load}
+                  add={this.add}
+                  setKeyValue={this.setKeyValue}
+                  changed={this.state.changed}
+                  uploadHelpers={this.uploadHelpers}
+                  isUploading={this.state.isUploading}
+                  progress={this.state.progress}
+                />
+              </div>
             )}
           />
         </div>

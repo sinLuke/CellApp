@@ -1,5 +1,5 @@
 import React from "react";
-import { Table, Button, Icon, Text } from "semantic-ui-react";
+import { Table, Button, Icon, Image, Radio } from "semantic-ui-react";
 class ItemTable extends React.Component {
   constructor(props) {
     super(props);
@@ -15,8 +15,10 @@ class ItemTable extends React.Component {
         return item.TOPIC_NAME;
       case 1:
         return item.DOCUMENT_NAME;
-      default:
+      case 2:
         return `Step ${item.PAGE_NUMBER + 1}`;
+      default:
+        return item.DESCRIPTION;
     }
   }
 
@@ -26,8 +28,10 @@ class ItemTable extends React.Component {
         return "Add Topic";
       case 1:
         return "Add Document";
-      default:
+      case 2:
         return "Add Step";
+      default:
+        return "Add Animation Item";
     }
   }
 
@@ -44,14 +48,23 @@ class ItemTable extends React.Component {
   render() {
     console.log("itemList item prop", this.props.items);
     return (
-      <Table celled disabled={this.props.isUploading}>
+      <Table
+        celled
+        disabled={this.props.isUploading}
+        inverted={this.props.editAnimation}
+      >
         <Table.Header>
           <Table.Row>
-            <Table.HeaderCell>{this.props.title}</Table.HeaderCell>
+            <Table.HeaderCell singleLine>{this.props.title}</Table.HeaderCell>
+            {this.props.type === 3 ? (
+              <Table.HeaderCell>Edit</Table.HeaderCell>
+            ) : (
+              " "
+            )}
           </Table.Row>
         </Table.Header>
 
-        <Table.Body>
+        <Table.Body padded>
           {this.props.items.map(item => (
             <Table.Row
               style={{ cursor: "pointer" }}
@@ -62,28 +75,62 @@ class ItemTable extends React.Component {
                 }
               }.bind(this)}
             >
-              {this.props.changed.has(item.id) ? (
+              <Table.Cell
+                warning={
+                  this.props.selected != item.id &&
+                  this.props.changed.has(item.id)
+                }
+                style={{
+                  backgroundColor: this.props.editAnimation
+                    ? this.props.selected === item.id
+                      ? "#0a84ffff"
+                      : "#333333ff"
+                    : this.props.selected === item.id
+                    ? "#007affff"
+                    : "white",
+                  color: this.props.editAnimation
+                    ? this.props.selected === item.id
+                      ? "#black"
+                      : "white"
+                    : this.props.selected === item.id
+                    ? "white"
+                    : "black"
+                }}
+              >
+                {this.props.changed.has(item.id) ? (
+                  <Icon name="dot circle outline" />
+                ) : (
+                  " "
+                )}
+                {this.getCellContent(item)}
+              </Table.Cell>
+              {this.props.type === 3 ? (
                 <Table.Cell
-                  warning={this.props.selected != item.id}
                   style={{
-                    backgroundColor:
-                      this.props.selected === item.id ? "#007affff" : "white",
-                    color: this.props.selected === item.id ? "white" : "black"
+                    backgroundColor: this.props.editAnimation
+                      ? this.props.selected === item.id
+                        ? "#0a84ffff"
+                        : "#333333ff"
+                      : this.props.selected === item.id
+                      ? "#007affff"
+                      : "white",
+                    color: this.props.editAnimation
+                      ? this.props.selected === item.id
+                        ? "#black"
+                        : "white"
+                      : this.props.selected === item.id
+                      ? "white"
+                      : "black"
                   }}
                 >
-                  <Icon name="dot circle outline" />
-                  {this.getCellContent(item)}
+                  {!item.IMAGE_URL ? (
+                    <Button>Delete Image</Button>
+                  ) : (
+                    <Button>Add Image</Button>
+                  )}
                 </Table.Cell>
               ) : (
-                <Table.Cell
-                  style={{
-                    backgroundColor:
-                      this.props.selected === item.id ? "#007affff" : "white",
-                    color: this.props.selected === item.id ? "white" : "black"
-                  }}
-                >
-                  {this.getCellContent(item)}
-                </Table.Cell>
+                " "
               )}
             </Table.Row>
           ))}

@@ -4,6 +4,8 @@ import ItemTable from "./itemTable";
 import { Redirect } from "react-router-dom";
 import { Grid, Segment } from "semantic-ui-react";
 import HomeDetail from "./HomeDetail";
+import AnimationDetail from "./animationDetail";
+
 class Home extends React.Component {
   constructor(props) {
     super(props);
@@ -35,6 +37,7 @@ class Home extends React.Component {
     );
     this.filterDocumentList = this.filterDocumentList.bind(this);
     this.filterStepList = this.filterStepList.bind(this);
+    this.filterAnimationList = this.filterAnimationList.bind(this);
   }
   filterDocumentList(id) {
     return Object.values(this.props.lists.documentList).filter(function(doc) {
@@ -45,6 +48,13 @@ class Home extends React.Component {
   filterStepList(id) {
     return Object.values(this.props.lists.stepList).filter(function(step) {
       return step.DOCUMENT_ID === id;
+    });
+  }
+  filterAnimationList(id) {
+    return Object.values(this.props.lists.animationItemList).filter(function(
+      item
+    ) {
+      return item.STEP_ID === id;
     });
   }
 
@@ -65,42 +75,46 @@ class Home extends React.Component {
 
     return (
       <div>
-        <Grid container stackable columns="equal" verticalAlign="top">
-          <Grid.Row stretched style={{ marginTop: "4em" }}>
-            <Grid.Column>
-              <ItemTable
-                selected={this.props.topicSelected}
-                setSelected={id => this.props.setSelected(0, id)}
-                items={Object.values(this.props.lists.topicList).sort(function(
-                  a,
-                  b
-                ) {
-                  if (a.PAGE_NUMBER < b.PAGE_NUMBER) {
-                    return -1;
-                  }
-                  if (a.PAGE_NUMBER > b.PAGE_NUMBER) {
-                    return 1;
-                  }
-                  if (a.created < b.created) {
-                    return -1;
-                  }
-                  if (a.created > b.created) {
-                    return 1;
-                  }
-                  return 0;
-                })}
-                title={"Topics"}
-                add={() => this.props.add(0, null)}
-                loading={false}
-                type={0}
-                changed={this.props.changed}
-                isUploading={this.props.isUploading}
-                progress={this.props.progress}
-              />
-            </Grid.Column>
+        <Grid columns="equal" verticalAlign="top" style={{ padding: "16px" }}>
+          <Grid.Row stretched>
+            {!this.props.editAnimation ? (
+              <Grid.Column width={3}>
+                <ItemTable
+                  selected={this.props.topicSelected}
+                  setSelected={id => this.props.setSelected(0, id)}
+                  items={Object.values(this.props.lists.topicList).sort(
+                    function(a, b) {
+                      if (a.PAGE_NUMBER < b.PAGE_NUMBER) {
+                        return -1;
+                      }
+                      if (a.PAGE_NUMBER > b.PAGE_NUMBER) {
+                        return 1;
+                      }
+                      if (a.created < b.created) {
+                        return -1;
+                      }
+                      if (a.created > b.created) {
+                        return 1;
+                      }
+                      return 0;
+                    }
+                  )}
+                  title={"Topics"}
+                  add={() => this.props.add(0, null)}
+                  loading={false}
+                  type={0}
+                  changed={this.props.changed}
+                  isUploading={this.props.isUploading}
+                  progress={this.props.progress}
+                  editAnimation={this.props.editAnimation}
+                />
+              </Grid.Column>
+            ) : (
+              " "
+            )}
 
-            {this.props.topicSelected ? (
-              <Grid.Column>
+            {this.props.topicSelected && !this.props.editAnimation ? (
+              <Grid.Column width={3}>
                 <ItemTable
                   selected={this.props.documentSelected}
                   setSelected={id => this.props.setSelected(1, id)}
@@ -133,6 +147,7 @@ class Home extends React.Component {
                   changed={this.props.changed}
                   isUploading={this.props.isUploading}
                   progress={this.props.progress}
+                  editAnimation={this.props.editAnimation}
                 />
               </Grid.Column>
             ) : (
@@ -140,7 +155,7 @@ class Home extends React.Component {
             )}
 
             {this.props.documentSelected ? (
-              <Grid.Column>
+              <Grid.Column width={2}>
                 <ItemTable
                   selected={this.props.stepSelected}
                   setSelected={id => this.props.setSelected(2, id)}
@@ -165,27 +180,66 @@ class Home extends React.Component {
                   changed={this.props.changed}
                   isUploading={this.props.isUploading}
                   progress={this.props.progress}
+                  editAnimation={this.props.editAnimation}
                 />
               </Grid.Column>
             ) : (
               " "
             )}
 
-            <Grid.Column width={8}>
-              <HomeDetail
-                topicSelected={this.props.topicSelected}
-                documentSelected={this.props.documentSelected}
-                stepSelected={this.props.stepSelected}
-                lists={this.props.lists}
-                add={this.props.add}
-                filterStepList={this.filterStepList}
-                changed={this.props.changed}
-                setKeyValue={this.props.setKeyValue}
-                uploadHelpers={this.props.uploadHelpers}
-                isUploading={this.props.isUploading}
-                progress={this.props.progress}
-              />
-            </Grid.Column>
+            {this.props.editAnimation ? (
+              <Grid.Column width={6}>
+                <ItemTable
+                  selected={this.props.animationItemSelected}
+                  setSelected={id => this.props.setSelected(3, id)}
+                  items={this.filterAnimationList(this.props.stepSelected)}
+                  title={`${this.props.lists.documentList[this.props.documentSelected].DOCUMENT_NAME} - Step ${this.props.lists.stepList[this.props.stepSelected].PAGE_NUMBER}`}
+                  add={parent => this.props.add(3, this.props.stepSelected)}
+                  loading={false}
+                  type={3}
+                  changed={this.props.changed}
+                  isUploading={this.props.isUploading}
+                  progress={this.props.progress}
+                  editAnimation={this.props.editAnimation}
+                />
+              </Grid.Column>
+            ) : (
+              " "
+            )}
+
+            {this.props.editAnimation && this.props.stepSelected ? (
+              <Grid.Column>
+                <AnimationDetail
+                  topicSelected={this.props.topicSelected}
+                  documentSelected={this.props.documentSelected}
+                  stepSelected={this.props.stepSelected}
+                  lists={this.props.lists}
+                  add={this.props.add}
+                  filterAnimationList={this.filterAnimationList}
+                  changed={this.props.changed}
+                  setKeyValue={this.props.setKeyValue}
+                  uploadHelpers={this.props.uploadHelpers}
+                  isUploading={this.props.isUploading}
+                  progress={this.props.progress}
+                />
+              </Grid.Column>
+            ) : (
+              <Grid.Column>
+                <HomeDetail
+                  topicSelected={this.props.topicSelected}
+                  documentSelected={this.props.documentSelected}
+                  stepSelected={this.props.stepSelected}
+                  lists={this.props.lists}
+                  add={this.props.add}
+                  filterStepList={this.filterStepList}
+                  changed={this.props.changed}
+                  setKeyValue={this.props.setKeyValue}
+                  uploadHelpers={this.props.uploadHelpers}
+                  isUploading={this.props.isUploading}
+                  progress={this.props.progress}
+                />
+              </Grid.Column>
+            )}
           </Grid.Row>
         </Grid>
       </div>

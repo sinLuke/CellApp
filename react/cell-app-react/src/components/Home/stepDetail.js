@@ -20,7 +20,7 @@ class StepDetail extends React.Component {
 
   render() {
     const animationOptions = [
-      { key: "auto", text: `Auto`, value: 1 },
+      { key: "auto", text: `Auto`, value: 2 },
       { key: "interactive", text: `Interactive`, value: 0 }
     ];
     console.log("topicList", this.props);

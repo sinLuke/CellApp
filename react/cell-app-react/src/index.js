@@ -8,16 +8,6 @@ import App from "./components/App";
 
 import { Responsive } from "semantic-ui-react";
 
-window.onbeforeunload = function(e) {
-  console.log("onbeforeunload");
-
-  // Cancel the event
-  e.preventDefault();
-
-  // Chrome requires returnValue to be set
-  e.returnValue = "Really want to quit the game?";
-};
-
 //Prevent Ctrl+S (and Ctrl+W for old browsers and Edge)
 document.onkeydown = function(e) {
   e = e || window.event; //Get event
@@ -37,7 +27,7 @@ document.onkeydown = function(e) {
 
 ReactDOM.render(
   <Responsive>
-    <App />
+    <App window={window} />
   </Responsive>,
   document.getElementById("root")
 );

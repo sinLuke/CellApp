@@ -17,7 +17,11 @@ class HomeDetail extends React.Component {
               stepCount={
                 this.props.filterStepList(this.props.documentSelected).length
               }
-              title={`${this.props.lists.documentList[this.props.documentSelected].DOCUMENT_NAME} - Step ${this.props.lists.stepList[this.props.stepSelected].PAGE_NUMBER}`}
+              title={`${
+                this.props.lists.documentList[this.props.documentSelected]
+                  .DOCUMENT_NAME
+              } - Step ${this.props.lists.stepList[this.props.stepSelected]
+                .PAGE_NUMBER + 1}`}
               changed={this.props.changed}
               uploadHelpers={this.props.uploadHelpers}
               setKeyValue={function(key, value) {

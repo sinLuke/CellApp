@@ -5,7 +5,6 @@ body {
     sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  background: red;
   overflow: hidden;
 }
 
@@ -16,8 +15,14 @@ code {
 
 tbody {
   display: block;
-  height: calc(100vh - 16em);
+  height: calc(100vh - 19em);
   overflow: auto;
+}
+
+.animation_image {
+  display: block;
+  background: red;
+  height: calc(100vh - 19em);
 }
 
 thead,
