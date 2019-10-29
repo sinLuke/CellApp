@@ -6,9 +6,7 @@ class AnimationStepDetail extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      start: true,
-      size: 1.0,
-      description: "New Animation Item"
+      start: true
     };
     this.changeStartEnd = this.changeStartEnd.bind(this);
   }
@@ -86,11 +84,26 @@ class AnimationStepDetail extends React.Component {
                     position: "absolute",
                     top: "0",
                     left: "0",
-                    width: "10%",
-                    height: "10%"
+                    width: "100%",
+                    height: "100%"
                   }}
                 >
-                  <AnimationCanvas />
+                  <AnimationCanvas
+                    start={this.state.start}
+                    item={this.props.item}
+                    items={Object.values(this.props.lists).filter(item => {
+                      return item.STEP_ID === this.props.item.STEP_ID;
+                    })}
+                    onControlledDragStop={(e, x, y) => {
+                      if (this.state.start) {
+                        this.props.setKeyValue("START_POSITION_X", x);
+                        this.props.setKeyValue("START_POSITION_Y", y);
+                      } else {
+                        this.props.setKeyValue("END_POSITION_X", x);
+                        this.props.setKeyValue("END_POSITION_Y", y);
+                      }
+                    }}
+                  />
                 </div>
               </div>
             </Table.Cell>
@@ -105,13 +118,25 @@ class AnimationStepDetail extends React.Component {
                     id="animation-item-detail-size-field"
                     control={Input}
                     label="Description"
-                    value={this.state.description}
+                    value={this.props.item.DESCRIPTION}
+                    onChange={function(e, { value }) {
+                      this.props.setKeyValue("DESCRIPTION", value);
+                    }.bind(this)}
                   />
                   <Form.Field
                     id="animation-item-detail-size-field"
                     control={Input}
                     label="Size"
-                    value={this.state.size}
+                    value={function() {
+                      if (isNaN(this.props.item.SIZE)) {
+                        return "10";
+                      } else {
+                        return this.props.item.SIZE;
+                      }
+                    }.bind(this)()}
+                    onChange={function(e, { value }) {
+                      this.props.setKeyValue("SIZE", value);
+                    }.bind(this)}
                   />
                 </Form.Group>
               </Form>

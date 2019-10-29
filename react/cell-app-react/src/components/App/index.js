@@ -48,16 +48,20 @@ class App extends React.Component {
   }
 
   handleUploadStart(id) {
+    console.log("handleUploadStart", id);
     this.setState({ isUploading: id, progress: 0 });
   }
   handleProgress(progress) {
+    console.log("handleProgress", progress);
     this.setState({ progress });
   }
   handleUploadError(error) {
+    console.log("handleUploadError", error);
     this.setState({ isUploading: null });
     window.alert(error);
   }
   handleUploadSuccess(collection, id, filename) {
+    console.log("handleUploadSuccess", collection, id, filename);
     firebase
       .storage()
       .ref("images")
@@ -79,6 +83,7 @@ class App extends React.Component {
                   changed: _changed
                 });
               }
+              break;
             case 1:
               if (this.state.documentList[id]) {
                 var _documentList = this.state.documentList;
@@ -90,6 +95,7 @@ class App extends React.Component {
                   changed: _changed
                 });
               }
+              break;
             case 2:
               if (this.state.stepList[id]) {
                 var _stepList = this.state.stepList;
@@ -101,6 +107,7 @@ class App extends React.Component {
                   changed: _changed
                 });
               }
+              break;
             default:
               if (this.state.animationItemList[id]) {
                 var _animationItemList = this.state.animationItemList;
@@ -185,6 +192,7 @@ class App extends React.Component {
         } else {
           this.setState({ step: null, animationItem: null });
         }
+        break;
       default:
         if (Object.keys(this.state.animationItemList).includes(id)) {
           var stepID = this.state.animationItemList[id].STEP_ID;
@@ -297,6 +305,7 @@ class App extends React.Component {
           document: _document,
           topic: _topic
         });
+        break;
 
       default:
         //this animation item dosen't exist
@@ -356,6 +365,7 @@ class App extends React.Component {
           }).length,
           created: new Date().getTime()
         };
+        break;
       default:
         collectionName = "ANIMATION_ITEM";
         item = {
@@ -365,6 +375,7 @@ class App extends React.Component {
           START_POSITION_X: 0.0,
           START_POSITION_Y: 0.0,
           IMAGE_URL: null,
+          SIZE: 10,
           STEP_ID: parent,
           created: new Date().getTime()
         };
@@ -397,6 +408,7 @@ class App extends React.Component {
               var _stepList = this.state.stepList;
               _stepList[docRef.id] = item;
               this.setState({ step: docRef.id, stepList: _stepList });
+              break;
             default:
               var _animationItemList = this.state.animationItemList;
               _animationItemList[docRef.id] = item;
@@ -433,9 +445,10 @@ class App extends React.Component {
       case 2:
         collectionName = "STEP";
         item = this.state.stepList[document];
+        break;
       default:
         collectionName = "ANIMATION_ITEM";
-        item = this.state.stepList[document];
+        item = this.state.animationItemList[document];
     }
 
     if (item) {
@@ -478,28 +491,28 @@ class App extends React.Component {
       ]) {
         topicSnapshots.forEach(doc => {
           var thisDoc = doc.data();
-          if (thisDoc.hidden != true) {
+          if (thisDoc.hidden !== true) {
             thisDoc.id = doc.id;
             topicList[doc.id] = thisDoc;
           }
         });
         documentSnapshots.forEach(doc => {
           var thisDoc = doc.data();
-          if (thisDoc.hidden != true) {
+          if (thisDoc.hidden !== true) {
             thisDoc.id = doc.id;
             documentList[doc.id] = thisDoc;
           }
         });
         stepSnapshots.forEach(doc => {
           var thisDoc = doc.data();
-          if (thisDoc.hidden != true) {
+          if (thisDoc.hidden !== true) {
             thisDoc.id = doc.id;
             stepList[doc.id] = thisDoc;
           }
         });
         animationItemSnapshots.forEach(doc => {
           var thisDoc = doc.data();
-          if (thisDoc.hidden != true) {
+          if (thisDoc.hidden !== true) {
             thisDoc.id = doc.id;
             animationItemList[doc.id] = thisDoc;
           }
@@ -518,7 +531,7 @@ class App extends React.Component {
 
   render() {
     this.props.window.onbeforeunload = function(e) {
-      if (this.state.changed.size != 0) {
+      if (this.state.changed.size !== 0) {
         console.log("onbeforeunload");
 
         // Cancel the event
@@ -544,18 +557,14 @@ class App extends React.Component {
             path={ROUTES.HOME}
             render={props => (
               <div>
-                {!this.state.editAnimation ? (
-                  <Button
-                    primary
-                    disabled={this.state.changed.size === 0}
-                    onClick={this.updateAll}
-                    style={{ marginTop: "4em", marginLeft: "16px" }}
-                  >
-                    {this.state.changed.size} Change(s), Save All
-                  </Button>
-                ) : (
-                  " "
-                )}
+                <Button
+                  primary
+                  disabled={this.state.changed.size === 0}
+                  onClick={this.updateAll}
+                  style={{ marginTop: "4em", marginLeft: "16px" }}
+                >
+                  {this.state.changed.size} Change(s), Save All
+                </Button>
 
                 {this.state.editAnimation ? (
                   <Button

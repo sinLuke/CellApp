@@ -127,7 +127,11 @@ class DocumentDetail extends React.Component {
                 <Form.Field label="Document Image"></Form.Field>
                 {this.props.document.IMAGE_URL ? (
                   <Segment>
-                    <Image fluid src={this.props.document.IMAGE_URL} />
+                    <Image
+                      draggable="false"
+                      fluid
+                      src={this.props.document.IMAGE_URL}
+                    />
                   </Segment>
                 ) : (
                   " "

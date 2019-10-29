@@ -75,7 +75,11 @@ class TopicDetail extends React.Component {
                 <Form.Field label="Topic Image"></Form.Field>
                 {this.props.topic.IMAGE_URL ? (
                   <Segment>
-                    <Image fluid src={this.props.topic.IMAGE_URL} />
+                    <Image
+                      draggable="false"
+                      fluid
+                      src={this.props.topic.IMAGE_URL}
+                    />
                   </Segment>
                 ) : (
                   " "

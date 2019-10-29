@@ -103,6 +103,7 @@ class Home extends React.Component {
                   add={() => this.props.add(0, null)}
                   loading={false}
                   type={0}
+                  setKeyValue={this.props.setKeyValue}
                   changed={this.props.changed}
                   isUploading={this.props.isUploading}
                   progress={this.props.progress}
@@ -144,6 +145,7 @@ class Home extends React.Component {
                   add={parent => this.props.add(1, this.props.topicSelected)}
                   loading={false}
                   type={1}
+                  setKeyValue={this.props.setKeyValue}
                   changed={this.props.changed}
                   isUploading={this.props.isUploading}
                   progress={this.props.progress}
@@ -177,6 +179,7 @@ class Home extends React.Component {
                   add={parent => this.props.add(2, this.props.documentSelected)}
                   loading={false}
                   type={2}
+                  setKeyValue={this.props.setKeyValue}
                   changed={this.props.changed}
                   isUploading={this.props.isUploading}
                   progress={this.props.progress}
@@ -193,10 +196,15 @@ class Home extends React.Component {
                   selected={this.props.animationItemSelected}
                   setSelected={id => this.props.setSelected(3, id)}
                   items={this.filterAnimationList(this.props.stepSelected)}
-                  title={`${this.props.lists.documentList[this.props.documentSelected].DOCUMENT_NAME} - Step ${this.props.lists.stepList[this.props.stepSelected].PAGE_NUMBER}`}
+                  title={`${
+                    this.props.lists.documentList[this.props.documentSelected]
+                      .DOCUMENT_NAME
+                  } - Step ${this.props.lists.stepList[this.props.stepSelected]
+                    .PAGE_NUMBER + 1}`}
                   add={parent => this.props.add(3, this.props.stepSelected)}
                   loading={false}
                   type={3}
+                  setKeyValue={this.props.setKeyValue}
                   changed={this.props.changed}
                   isUploading={this.props.isUploading}
                   progress={this.props.progress}
@@ -213,6 +221,11 @@ class Home extends React.Component {
                   topicSelected={this.props.topicSelected}
                   documentSelected={this.props.documentSelected}
                   stepSelected={this.props.stepSelected}
+                  item={
+                    this.props.lists.animationItemList[
+                      this.props.animationItemSelected
+                    ]
+                  }
                   lists={this.props.lists}
                   add={this.props.add}
                   filterAnimationList={this.filterAnimationList}

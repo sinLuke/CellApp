@@ -77,8 +77,9 @@ class ItemTable extends React.Component {
             >
               <Table.Cell
                 warning={
-                  this.props.selected != item.id &&
-                  this.props.changed.has(item.id)
+                  this.props.selected !== item.id &&
+                  this.props.changed.has(item.id) &&
+                  !this.props.editAnimation
                 }
                 style={{
                   backgroundColor: this.props.editAnimation
@@ -106,6 +107,11 @@ class ItemTable extends React.Component {
               </Table.Cell>
               {this.props.type === 3 ? (
                 <Table.Cell
+                  warning={
+                    this.props.selected !== item.id &&
+                    this.props.changed.has(item.id) &&
+                    !this.props.editAnimation
+                  }
                   style={{
                     backgroundColor: this.props.editAnimation
                       ? this.props.selected === item.id
@@ -123,10 +129,24 @@ class ItemTable extends React.Component {
                       : "black"
                   }}
                 >
-                  {!item.IMAGE_URL ? (
-                    <Button>Delete Image</Button>
+                  {item.IMAGE_URL ? (
+                    <Button
+                      color="red"
+                      disabled={!item.IMAGE_URL || this.props.isUploading}
+                      onClick={function() {
+                        this.props.setKeyValue(
+                          3,
+                          item.id,
+                          null,
+                          "IMAGE_URL",
+                          null
+                        );
+                      }.bind(this)}
+                    >
+                      Delete Image
+                    </Button>
                   ) : (
-                    <Button>Add Image</Button>
+                    "No Image Uploaded"
                   )}
                 </Table.Cell>
               ) : (

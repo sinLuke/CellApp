@@ -4,15 +4,71 @@ import Draggable from "react-draggable";
 class AnimationCanvas extends React.Component {
   constructor(props) {
     super(props);
+    this.state = {
+      width: 100,
+      height: 100
+    };
+  }
+  componentDidMount() {
+    this.setState({
+      width: this.container.offsetWidth,
+      height: this.container.offsetHeight
+    });
   }
   render() {
+    console.log(this.props.items);
+
     return (
-      <Draggable>
-        <Image
-          src="https://firebasestorage.googleapis.com/v0/b/cell-app.appspot.com/o/images%2Fbd7398fc-6563-45f6-a6e2-75326fdd1973.png?alt=media&token=aa2d3ddc-a387-436c-a483-1ac23e9cf06b"
-          draggable="false"
-        />
-      </Draggable>
+      <div
+        ref={el => (this.container = el)}
+        style={{ width: "100%", height: "100%" }}
+      >
+        {this.props.items.map(item => (
+          <Draggable
+            style={{
+              zIndex: item.id === this.props.item.id ? "100" : "1",
+              position: "absolute"
+            }}
+            onStart={() => item.id === this.props.item.id}
+            bounds="parent"
+            onStop={(e, position) => {
+              const { x, y } = position;
+              this.props.onControlledDragStop(
+                e,
+                x / 0.01 / this.state.width,
+                y / 0.01 / this.state.height
+              );
+            }}
+            position={{
+              x:
+                (this.props.start
+                  ? item.START_POSITION_X
+                  : item.END_POSITION_X) *
+                0.01 *
+                this.state.width,
+              y:
+                (this.props.start
+                  ? item.START_POSITION_Y
+                  : item.END_POSITION_Y) *
+                0.01 *
+                this.state.height
+            }}
+          >
+            <Image
+              style={{
+                position: "absolute",
+                height: `${item.SIZE}%`,
+                outline:
+                  item.id === this.props.item.id ? "2px dotted #000000" : "",
+                backgroundColor:
+                  item.id === this.props.item.id ? "rgba(255, 255, 0, 0.3)" : ""
+              }}
+              src={item.IMAGE_URL}
+              draggable="false"
+            />
+          </Draggable>
+        ))}
+      </div>
     );
   }
 }

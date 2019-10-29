@@ -135,7 +135,11 @@ class StepDetail extends React.Component {
                 <Form.Field label="Step Image"></Form.Field>
                 {this.props.step.IMAGE_URL ? (
                   <Segment>
-                    <Image fluid src={this.props.step.IMAGE_URL} />
+                    <Image
+                      fluid
+                      draggable="false"
+                      src={this.props.step.IMAGE_URL}
+                    />
                   </Segment>
                 ) : (
                   " "
