@@ -353,7 +353,10 @@ class App extends React.Component {
       case 2:
         collectionName = "STEP";
         item = {
-          AUTO_ANIMATION: 1,
+          TYPE: 1,
+          ANSWER: "",
+          CHOICES: "",
+          ANSWER_EXPLANATION: "Good job!",
           DOCUMENT_ID: parent,
           IMAGE_SUBTITLE: "Subtitle",
           IMAGE_URL: null,
@@ -579,7 +582,10 @@ class App extends React.Component {
                 ) : (
                   <Button
                     primary
-                    disabled={!this.state.step}
+                    disabled={
+                      !this.state.step ||
+                      this.state.stepList[this.state.step].TYPE >= 10
+                    }
                     onClick={() => {
                       this.setState({ editAnimation: true });
                     }}

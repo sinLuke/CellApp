@@ -7,7 +7,9 @@ import {
   TextArea,
   Button,
   Segment,
-  Progress
+  Progress,
+  Label,
+  Icon
 } from "semantic-ui-react";
 import React from "react";
 import FileUploader from "react-firebase-file-uploader";
@@ -19,9 +21,11 @@ class StepDetail extends React.Component {
   }
 
   render() {
-    const animationOptions = [
-      { key: "auto", text: `Auto`, value: 2 },
-      { key: "interactive", text: `Interactive`, value: 0 }
+    const typeOptions = [
+      { key: "interactive", text: `Interactive Animation`, value: 0 },
+      { key: "auto", text: `Auto Animation`, value: 1 },
+      { key: "choice_quiz", text: `Multiple Choice`, value: 10 },
+      { key: "fill_quiz", text: `Fill Blanks`, value: 11 }
     ];
     console.log("topicList", this.props);
     const documentOptions = Object.values(this.props.documentList)
@@ -30,7 +34,9 @@ class StepDetail extends React.Component {
           if (this.props.topicList[document.TOPIC_ID]) {
             return {
               key: document.id,
-              text: `${this.props.topicList[document.TOPIC_ID].TOPIC_NAME} - ${document.DOCUMENT_NAME}`,
+              text: `${this.props.topicList[document.TOPIC_ID].TOPIC_NAME} - ${
+                document.DOCUMENT_NAME
+              }`,
               value: document.id
             };
           } else {
@@ -64,6 +70,7 @@ class StepDetail extends React.Component {
           <Table.Row>
             <Table.Cell>
               <Form>
+                {/* Step ID */}
                 <Form.Group widths="equal">
                   <Form.Field
                     id="step-detail-id-field"
@@ -73,6 +80,9 @@ class StepDetail extends React.Component {
                     disabled
                   />
                 </Form.Group>
+
+                {/* Document ID */}
+
                 <Form.Group widths="equal">
                   <Form.Field
                     options={documentOptions}
@@ -88,6 +98,9 @@ class StepDetail extends React.Component {
                     disabled
                   />
                 </Form.Group>
+
+                {/* PageNumber and Type */}
+
                 <Form.Group widths="equal">
                   <Form.Field
                     control={Input}
@@ -111,18 +124,21 @@ class StepDetail extends React.Component {
                     }.bind(this)}
                   />
                   <Form.Field
-                    options={animationOptions}
+                    options={typeOptions}
                     control={Select}
                     label={{
-                      children: "Animation",
+                      children: "Type",
                       htmlFor: "step-detail-animation-field"
                     }}
-                    value={this.props.step.AUTO_ANIMATION}
+                    value={this.props.step.TYPE}
                     onChange={function(e, { value }) {
-                      this.props.setKeyValue("AUTO_ANIMATION", value);
+                      this.props.setKeyValue("TYPE", value);
                     }.bind(this)}
                   />
                 </Form.Group>
+
+                {/* Main TextField */}
+
                 <Form.Field
                   id="step-detail-text-area"
                   control={TextArea}
@@ -132,6 +148,100 @@ class StepDetail extends React.Component {
                     this.props.setKeyValue("TEXT", value);
                   }.bind(this)}
                 />
+
+                {/* Choice TextField */}
+
+                {this.props.step.TYPE == 10 ? (
+                  <Form.Field
+                    id="step-detail-choices-area"
+                    control={TextArea}
+                    label='Choices (seperate by ",")'
+                    value={this.props.step.CHOICES}
+                    onChange={function(e, { value }) {
+                      this.props.setKeyValue("CHOICES", value);
+                    }.bind(this)}
+                  />
+                ) : (
+                  " "
+                )}
+
+                {/* Answer TextField */}
+
+                {this.props.step.TYPE == 10 || this.props.step.TYPE == 11 ? (
+                  <Form.Field
+                    id="step-detail-answer-area"
+                    control={TextArea}
+                    label="Answer"
+                    disabled={this.props.step.TYPE == 10}
+                    value={this.props.step.ANSWER}
+                    onChange={function(e, { value }) {
+                      this.props.setKeyValue("ANSWER", value);
+                    }.bind(this)}
+                  />
+                ) : (
+                  " "
+                )}
+
+                {/* Answer Explanation */}
+
+                {this.props.step.TYPE == 10 || this.props.step.TYPE == 11 ? (
+                  <Form.Field
+                    id="step-detail-answer-explanation-area"
+                    control={TextArea}
+                    label="Answer Explanation"
+                    value={this.props.step.ANSWER_EXPLANATION}
+                    onChange={function(e, { value }) {
+                      this.props.setKeyValue("ANSWER_EXPLANATION", value);
+                    }.bind(this)}
+                  />
+                ) : (
+                  " "
+                )}
+
+                {/* Multiple Choice Preview Area */}
+
+                {this.props.step.TYPE == 10 && this.props.step.CHOICES ? (
+                  <div style={{ paddingBottom: "0.5em" }}>
+                    <Form.Field
+                      id="step-detail-choice-field"
+                      label="Select the correct answer"
+                    />
+                    {this.props.step.CHOICES.trim()
+                      .split(",")
+                      .filter(choice => {
+                        return choice.trim().toLowerCase() !== "";
+                      })
+                      .map(choice => (
+                        <div>
+                          {this.props.step.ANSWER.trim().toLowerCase() ===
+                            choice.trim().toLowerCase() &&
+                          choice.trim().toLowerCase() !== "" ? (
+                            <Label color="red" style={{ margin: "0.2em" }}>
+                              <Icon name="check" />
+                              {choice}
+                            </Label>
+                          ) : (
+                            <Label
+                              as="a"
+                              onClick={() =>
+                                this.props.setKeyValue("ANSWER", choice.trim())
+                              }
+                              style={{ margin: "0.2em" }}
+                            >
+                              {choice}
+                            </Label>
+                          )}
+
+                          <br></br>
+                        </div>
+                      ))}
+                  </div>
+                ) : (
+                  " "
+                )}
+
+                {/* Step Image */}
+
                 <Form.Field label="Step Image"></Form.Field>
                 {this.props.step.IMAGE_URL ? (
                   <Segment>
@@ -205,6 +315,9 @@ class StepDetail extends React.Component {
                     />
                   </Form.Group>
                 )}
+
+                {/* Step Image Subtitle */}
+
                 <Form.Group widths="equal">
                   <Form.Field
                     id="step-detail-image-subtitle-field"
@@ -216,6 +329,9 @@ class StepDetail extends React.Component {
                     }.bind(this)}
                   />
                 </Form.Group>
+
+                {/* Save Button */}
+
                 <Form.Field
                   id="step-detail-comform"
                   control={Button}
