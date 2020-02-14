@@ -27,10 +27,9 @@ public class DataManager {
     private Map<String, Step> steps;
     private Map<String, AnimationBackground> animationBackgrounds;
     private Map<String, AnimationItem> animationItems;
-    private Map<String, List<Doc>> documents;
     private static FirebaseFirestore firebaseFirestore = FirebaseFirestore.getInstance();
 
-    public static DataManager shared = new DataManager(null);
+    public static DataManager shared = null;
 
     private CollectionReference topicRef;
     private CollectionReference docRef;
@@ -44,9 +43,6 @@ public class DataManager {
         steps = new HashMap<>();
         animationBackgrounds = new HashMap<>();
         animationItems = new HashMap<>();
-        if (activity != null) {
-            downloadData(activity);
-        }
     }
 
     public void downloadData(Context activity){
@@ -59,7 +55,7 @@ public class DataManager {
     }
 
     public void finishDownloads(Context activity){
-        NetworkManager.shared.networkManagerDidDownloadData(null, activity);
+        AppDelegate.shared.sharedUserManager.updateUserHistory(activity);
     }
 
     public void downloadTopics(final Context activity){
@@ -214,7 +210,7 @@ public class DataManager {
     }
     public int getRecentDocumentsCount() {
         List<Doc> sortedDoc = new ArrayList();
-        for (Doc doc: this.docs.values()) {
+        for (Doc doc : this.docs.values()) {
             if (doc.existInUserHistory()) {
                 sortedDoc.add(doc);
             }
@@ -222,14 +218,11 @@ public class DataManager {
         return sortedDoc.size();
     }
 
-    public List<Doc> getDocumentsForTopic(String topicID) {
-        return documents.get(topicID);
-    }
-
     public List<Doc> getSortedDocuments(final boolean sortByTime){
         List<Doc> sortedDoc = new ArrayList();
         for (Doc doc: this.docs.values()) {
-            if (doc.existInUserHistory()) {
+            DocumentCompleteRate rate = doc.getCompletionRate();
+            if (doc.existInUserHistory() && !rate.isFinished()) {
                 sortedDoc.add(doc);
             }
         }

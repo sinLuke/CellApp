@@ -1,0 +1,79 @@
+{
+  "project_info": {
+    "project_number": "854633007097",
+    "firebase_url": "https://cell-app.firebaseio.com",
+    "project_id": "cell-app",
+    "storage_bucket": "cell-app.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:854633007097:android:0dbbba5819e01f092fdf28",
+        "android_client_info": {
+          "package_name": "com.cellgroup.cellapp"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "854633007097-lt4gmtls6292vs226e91d9jr8goeqssi.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.cellgroup.cellapp",
+            "certificate_hash": "dc35e4afd440ff83a3b54a31b51ee4dfa58fe281"
+          }
+        },
+        {
+          "client_id": "854633007097-f1o427kr05eel5toorghp7i8rh7on88f.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.cellgroup.cellapp",
+            "certificate_hash": "6a6680ed75623d9cf06582fde3d5ffa06f9410ee"
+          }
+        },
+        {
+          "client_id": "854633007097-ejuvdbhdp1ps7kds31n96utcquv20q10.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.cellgroup.cellapp",
+            "certificate_hash": "5f9b511933b405df4123408707437f903a4d4881"
+          }
+        },
+        {
+          "client_id": "854633007097-3iaiqqasj2t3ag4u6g6n103rb7to8ckn.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.cellgroup.cellapp",
+            "certificate_hash": "0e57301c2820789a977c4d7b4a8d9194031b629b"
+          }
+        },
+        {
+          "client_id": "854633007097-i50h3jod75l1deaqukpfi8fvskktosr9.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB9deOvn75HB14x_G-rW_8B6ww8FOFwyCY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "854633007097-mcg4jcedqugpjeg18m8bcrcdinc903pq.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "854633007097-bi0p1fgi6redrhr8kd1djgsqunt85ape.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.cellgroup.cellapp"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

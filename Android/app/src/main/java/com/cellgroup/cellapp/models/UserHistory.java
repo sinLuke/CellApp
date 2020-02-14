@@ -53,6 +53,8 @@ public class UserHistory {
                     newUserHistory.lastViewd = new Date();
                     newUserHistory.step = new WeakReference<>(step);
 
+                    Doc doc = step.doc.get();
+
                     createUserHistoryCallBackDelegate.handler(newUserHistory);
                 } else {
                     AppDelegate.shared.applicationDidReportException("Firestore get failed with " + pTask.getException());

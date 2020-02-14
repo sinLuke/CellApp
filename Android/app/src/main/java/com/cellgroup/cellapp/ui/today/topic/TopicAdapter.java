@@ -9,6 +9,7 @@ import android.view.ViewGroup;
 
 import com.cellgroup.cellapp.AppState;
 import com.cellgroup.cellapp.models.Doc;
+import com.cellgroup.cellapp.models.DocumentCompleteRate;
 import com.cellgroup.cellapp.models.Topic;
 import com.cellgroup.cellapp.ui.ViewHolderCallBackDelegate;
 import com.cellgroup.cellapp.ui.today.TodayGroupTitleHolder;
@@ -51,6 +52,7 @@ public class TopicAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
         if (holder.getClass().isAssignableFrom(TopicDocumentItemHolder.class)) {
             TopicDocumentItemHolder topicDocumentItemHolder = (TopicDocumentItemHolder) holder;
             Doc doc = new ArrayList<Doc>(topic.docs.values()).get(position);
+
             topicDocumentItemHolder.bind(doc, getActivity());
 
         }

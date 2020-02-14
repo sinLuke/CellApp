@@ -18,6 +18,7 @@ import com.squareup.picasso.Picasso;
 import java.lang.ref.WeakReference;
 import java.util.List;
 
+import androidx.annotation.ColorLong;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -45,6 +46,7 @@ public class TodayAllTopicsTopicItemHolder extends RecyclerView.ViewHolder imple
     }
 
     public void bind(Topic pTopic, Context activity) {
+        itemView.setBackgroundColor(Color.TRANSPARENT);
         this.topic = new WeakReference<>(pTopic);
         mainTextView.setText(pTopic.TOPIC_NAME);
         secondaryTextView.setText(String.format("%d Documents", pTopic.docs.size()));
@@ -79,7 +81,7 @@ public class TodayAllTopicsTopicItemHolder extends RecyclerView.ViewHolder imple
     @Override
     public void onClick(View v) {
         if (callBackDelegate.holderShouldRecieveUserInput()) {
-            itemView.setBackgroundColor(Color.GRAY);
+            itemView.setBackgroundColor(Color.LTGRAY);
             if (this.topic != null && this.topic.get() != null) {
                 callBackDelegate.holderDidCallSendingObject(this, this.topic.get());
             }

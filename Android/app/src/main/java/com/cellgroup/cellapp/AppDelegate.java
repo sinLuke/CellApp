@@ -11,6 +11,8 @@ import android.widget.Toast;
 import com.cellgroup.cellapp.network.DataManager;
 import com.cellgroup.cellapp.network.NetworkManager;
 import com.cellgroup.cellapp.network.UserManager;
+import com.cellgroup.cellapp.ui.InitalScreen.InitalScreen;
+import com.cellgroup.cellapp.ui.login.InitializeUserActivity;
 import com.cellgroup.cellapp.ui.login.LoginActivity;
 import com.google.firebase.auth.FirebaseUser;
 
@@ -19,81 +21,58 @@ public class AppDelegate {
     private int RC_SIGN_IN = 0;
 
     public static AppDelegate shared = new AppDelegate();
+    public String currentScreen = InitalScreen.class.getName();
 
     private Context currentActivity;
-    private NetworkManager sharedNetworkManager;
-    private UserManager sharedUserManager;
+    public NetworkManager sharedNetworkManager;
+    public UserManager sharedUserManager;
 
     private void AppDelegate(){return;}
 
     public void applicationDidlaunched(Context activity) {
-        applicationShouldRequireLogin(activity);
+        applicationLaunchingProcessDidFinishedCurrentTask(activity);
     }
 
-    //handling login
-    public void applicationShouldRequireLogin(Context activity) {
-
+    public void applicationLaunchingProcessDidFinishedCurrentTask(Context activity) {
         currentActivity = activity;
         FirebaseUser user = UserManager.getCurrentUser();
         if (user == null) {
             Intent i = new Intent(currentActivity, LoginActivity.class);
             currentActivity.startActivity(i);
-        } else {
-            UserManager.getUserManager(user, activity);
+            return;
         }
-    }
-
-    public void applicationDidFinisheLogin(Context activity, UserManager pSharedUserManager) {
-        sharedUserManager = pSharedUserManager;
-        applicationWillInitalizeUser(activity);
-    }
-
-    //Initialize User for first time login, receive UserManager callback
-    public void applicationWillInitalizeUser(Context activity) {
-        sharedUserManager.checkIfUserFirstLogin(activity);
-    }
-
-    public void applicationDidInitializeUser(Context activity, UserManager user) {
-        DatabseWillCheckingUpdates(activity);
-    }
-
-    public void DatabseWillCheckingUpdates(Context activity){
-        NetworkManager.getDataManager(activity);
-    }
-
-    //receive DataManager callback
-    public void DatabseDidCheckingUpdates(NetworkManager pSharedNetworkManager, Context activity){
-        UserHistoryWillCheckingUpdates(activity);
-        sharedNetworkManager = pSharedNetworkManager;
-    }
-
-    public void UserHistoryWillCheckingUpdates(Context activity){
-        UserManager.shared.willUpdateUserHistory(activity, UserManager.shared);
-    }
-
-    //receive DataManager callback
-    public void UserHistoryDidCheckingUpdates(){
-        applicationMoveToMainScreen();
+        if (sharedUserManager == null) {
+            UserManager.getUserManager(user, activity);
+            return;
+        }
+//        if (!sharedUserManager.checkIfUserFirstLogin(activity)) {
+//            Intent i = new Intent(activity, InitializeUserActivity.class);
+//            activity.startActivity(i);
+//            return;
+//        }
+        if (!sharedUserManager.checkIfUserEmailVerified(activity)) {
+            sharedUserManager.verifyEmail(activity);
+            return;
+        }
+        if (DataManager.shared == null) {
+            NetworkManager.getNetworkManager(activity);
+            return;
+        }
+        applicationMoveToScreenIfNeeded(MainActivity.class);
     }
 
     //handling exception
     public void applicationDidReportException(String withMessage){
         if (currentActivity != null) {
             Toast.makeText(currentActivity, withMessage, Toast.LENGTH_LONG).show();
-            applicationShouldRequireLogin(currentActivity);
+            applicationLaunchingProcessDidFinishedCurrentTask(currentActivity);
         }
     }
 
-    public void applicationMoveToMainScreen() {
-        Intent i = new Intent(currentActivity, MainActivity.class);
-        currentActivity.startActivity(i);
-    }
-
-    public UserManager getSharedUserManager(){
-        return sharedUserManager;
-    }
-
-    public NetworkManager getSharedNetworkManager(){
-        return sharedNetworkManager;
+    public void applicationMoveToScreenIfNeeded(Class<? extends Activity> activityClass) {
+        if (currentScreen != activityClass.getName()) {
+            Intent i = new Intent(currentActivity, activityClass);
+            currentActivity.startActivity(i);
+        }
     }
 }

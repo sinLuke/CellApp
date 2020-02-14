@@ -23,7 +23,7 @@ public class NetworkManager {
         return;
     }
 
-    public static void getDataManager(final Context activity){
+    public static void getNetworkManager(final Context activity){
         DocumentReference docRef = firebaseFirestore.collection("var").document("db_version");
         docRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
             @Override
@@ -33,6 +33,7 @@ public class NetworkManager {
                     if (document.exists()) {
 
                         shared = new NetworkManager(activity);
+
                         shared.callBackCurrentOnlineDatabaseVersion(activity);
                     } else {
                         AppDelegate.shared.applicationDidReportException("Can't detect the online database version");
@@ -50,13 +51,15 @@ public class NetworkManager {
 
     public void downloadData(Context activity){
         DataManager.shared = new DataManager(activity);
+        DataManager.shared.downloadData(activity);
     }
 
     public void networkManagerDidDownloadData(String ErrorMessage, Context activity){
         if (ErrorMessage != null) {
             AppDelegate.shared.applicationDidReportException(ErrorMessage);
         } else {
-            AppDelegate.shared.DatabseDidCheckingUpdates(shared, activity);
+            AppDelegate.shared.sharedNetworkManager = shared;
+            AppDelegate.shared.applicationLaunchingProcessDidFinishedCurrentTask(activity);
         }
     }
 }

@@ -81,7 +81,7 @@ public class TodayItemHolder extends RecyclerView.ViewHolder implements View.OnC
     @Override
     public void onClick(View v) {
         if (callBackDelegate.holderShouldRecieveUserInput()) {
-            itemView.setBackgroundColor(Color.GRAY);
+            itemView.setBackgroundColor(Color.LTGRAY);
             if (this.doc != null && this.doc.get() != null) {
                 callBackDelegate.holderDidCallSendingObject(this, this.doc.get());
             }

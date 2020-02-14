@@ -40,6 +40,11 @@ public class Doc {
         return userManager.getLastViewDateOfDocument(this);
     }
 
+    public Step getLastViewStep(){
+        UserManager userManager = UserManager.shared;
+        return userManager.getLastViewStepOfDocument(this);
+    }
+
     public boolean existInUserHistory() {
         UserManager userManager = UserManager.shared;
         return userManager.isDocumentExistInUserHistory(this);

@@ -8,6 +8,7 @@ public class DocumentCompleteRate {
     public DocumentCompleteRate(int stepCount, int completionCount) {
         this.stepCount = stepCount;
         this.completionCount = completionCount;
+
         if (stepCount == 0 || stepCount < completionCount) {
             this.rate = 0;
         } else {

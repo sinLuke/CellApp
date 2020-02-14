@@ -11,6 +11,7 @@ import android.widget.TextView;
 
 import com.cellgroup.cellapp.R;
 import com.cellgroup.cellapp.models.Doc;
+import com.cellgroup.cellapp.models.DocumentCompleteRate;
 import com.cellgroup.cellapp.models.Topic;
 import com.cellgroup.cellapp.network.UserManager;
 import com.cellgroup.cellapp.ui.ViewHolderCallBackDelegate;
@@ -44,7 +45,7 @@ public class TopicDocumentItemHolder extends RecyclerView.ViewHolder implements 
     }
 
     public void bind(Doc doc, Context activity) {
-
+        DocumentCompleteRate rate = doc.getCompletionRate();
         mainTextView.setText(activity.getText(R.string.setting_change_display_name));
         secondaryTextView.setText(UserManager.getCurrentUser().getDisplayName());
 
@@ -53,7 +54,7 @@ public class TopicDocumentItemHolder extends RecyclerView.ViewHolder implements 
         if (doc != null) {
             this.doc = new WeakReference<>(doc);
             mainTextView.setText(doc.DOCUMENT_NAME);
-            secondaryTextView.setText(String.format("%d Steps", doc.steps.size()));
+            secondaryTextView.setText(String.format("%d Steps, %d%% Complete", doc.steps.size(), (int) (rate.rate*100)));
         }
 
         if (doc.IMAGE_URL != null) {
@@ -87,7 +88,7 @@ public class TopicDocumentItemHolder extends RecyclerView.ViewHolder implements 
     @Override
     public void onClick(View view) {
         if (callBackDelegate.holderShouldRecieveUserInput()) {
-            itemView.setBackgroundColor(Color.GRAY);
+            itemView.setBackgroundColor(Color.LTGRAY);
             if (this.doc != null && this.doc.get() != null) {
                 callBackDelegate.holderDidCallSendingObject(this, this.doc.get());
             }

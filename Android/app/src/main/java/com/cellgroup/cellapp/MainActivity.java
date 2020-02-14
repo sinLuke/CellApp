@@ -26,7 +26,7 @@ import android.widget.Toast;
 
 import static com.cellgroup.cellapp.R.id.nav_view;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends RootActivity {
 
     private AppBarConfiguration mAppBarConfiguration;
 

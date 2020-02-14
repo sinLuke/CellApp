@@ -13,30 +13,25 @@ import com.cellgroup.cellapp.R;
 import com.cellgroup.cellapp.models.Doc;
 import com.cellgroup.cellapp.models.DocumentCompleteRate;
 import com.cellgroup.cellapp.models.Step;
+import com.cellgroup.cellapp.models.UserData;
 import com.cellgroup.cellapp.models.UserHistory;
 import com.cellgroup.cellapp.ui.login.InitializeUserActivity;
-import com.firebase.ui.auth.data.model.User;
 import com.google.android.gms.auth.api.signin.*;
 import com.google.android.gms.common.api.*;
 import com.google.android.gms.tasks.*;
 import com.google.firebase.auth.*;
 import com.google.firebase.firestore.*;
 
-import java.lang.reflect.Array;
-import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
-import androidx.recyclerview.widget.SortedList;
 
-public class UserManager implements UserHistoryUpdateDelegate {
+public class UserManager {
 
     private static FirebaseAuth mAuth = FirebaseAuth.getInstance();
     private static GoogleSignInOptions gso;
@@ -49,8 +44,8 @@ public class UserManager implements UserHistoryUpdateDelegate {
     private Map<String, UserHistory> userHistory = new HashMap<>();
     private Set<Doc> existDocs = new HashSet();
 
-    private UserManager(int scope) {
-        currentUserScopte = scope;
+    private UserManager(UserData userData) {
+        currentUserScopte = userData.userScope;
     }
 
     public static FirebaseUser getCurrentUser(){
@@ -73,8 +68,23 @@ public class UserManager implements UserHistoryUpdateDelegate {
                 }
             }
         }
-        Log.d("getLastViewDateOfDocument", doc.DOCUMENT_NAME);
         return maxDate;
+    }
+
+    public Step getLastViewStepOfDocument(Doc doc) {
+        Date maxDate = null;
+        Step lastViewdStep = null;
+        for (Step step: doc.steps.values()) {
+            UserHistory thisUserHistory = this.userHistory.get(step.id);
+            if (thisUserHistory != null) {
+                Date lastViewed = this.userHistory.get(step.id).lastViewd;
+                if (maxDate == null || lastViewed.after(maxDate)) {
+                    maxDate = lastViewed;
+                    lastViewdStep = step;
+                }
+            }
+        }
+        return lastViewdStep;
     }
 
     public DocumentCompleteRate getCompleteRateOfDocument(Doc doc) {
@@ -82,7 +92,6 @@ public class UserManager implements UserHistoryUpdateDelegate {
         int CompletionCount = 0;
         for (Step step: doc.steps.values()) {
             StepCount += 1;
-            UserHistory thisUserHistory = this.userHistory.get(step.id);
             if (isStepCompleted(step)) {
                 CompletionCount += 1;
             }
@@ -91,19 +100,8 @@ public class UserManager implements UserHistoryUpdateDelegate {
         return new DocumentCompleteRate(StepCount, CompletionCount);
     }
 
-    public void setStepCompleted(UserHistory userHistory) {
-        Step userHistoryStep = userHistory.step.get();
-        if (userHistoryStep != null) {
-            this.userHistory.put(userHistoryStep.id, userHistory);
-            existDocs.add(userHistoryStep.doc.get());
-        }
-    }
-
     public boolean isStepCompleted(Step step) {
         UserHistory thisUserHistory = this.userHistory.get(step.id);
-        Log.d("isStepCompleted", "isStepCompleted");
-
-        Log.d("map", String.format("%s", (new PrettyPrintingMap(this.userHistory)).toString()));
         if (thisUserHistory != null) {
             Log.d("isStepCompleted", "finished");
             return thisUserHistory.finished;
@@ -324,14 +322,17 @@ public class UserManager implements UserHistoryUpdateDelegate {
                 if (pTask.isSuccessful()) {
                     DocumentSnapshot document = pTask.getResult();
                     if (document.exists()) {
-                        int userScope = FirestoreCoder.getDataFromUser(document.getData());
-                        shared = new UserManager(userScope);
-                        shared.didUpdateUserHistory(activity);
+                        UserData userData = new UserData(document.getData(), document.getId());
+                        shared = new UserManager(userData);
+                        AppDelegate.shared.sharedUserManager = shared;
+                        AppDelegate.shared.applicationLaunchingProcessDidFinishedCurrentTask(activity);
                     } else {
                         DocumentReference userRef = firebaseFirestore.collection("Users").document(user.getUid());
-                        userRef.set(FirestoreCoder.setDataByUser(10));
-                        shared = new UserManager(10);
-                        shared.didUpdateUserHistory(activity);
+                        UserData newUserData = new UserData();
+                        userRef.set(newUserData.synthesize());
+                        shared = new UserManager(newUserData);
+                        AppDelegate.shared.sharedUserManager = shared;
+                        AppDelegate.shared.applicationLaunchingProcessDidFinishedCurrentTask(activity);
                     }
                 } else {
                     AppDelegate.shared.applicationDidReportException("Firestore get failed with " + pTask.getException());
@@ -340,7 +341,16 @@ public class UserManager implements UserHistoryUpdateDelegate {
         });
     }
 
-    public void willUpdateUserHistory(final Context activity, final UserHistoryUpdateDelegate delegate){
+    public void addUserHistory(Step step, UserHistory userHistory) {
+        if (step != null) {
+            Log.d("UserHistory", "Add" + step.doc.get().DOCUMENT_NAME + ": " + step.PAGE_NUMBER);
+            Doc doc = step.doc.get();
+            existDocs.add(doc);
+            UserManager.shared.userHistory.put(step.id, userHistory);
+        }
+    }
+
+    public void updateUserHistory(final Context activity){
         CollectionReference userHistoryRef = firebaseFirestore.collection("UserHistory");
         Log.d("new User History", "start");
         userHistoryRef.whereEqualTo("userID", UserManager.getCurrentUser().getUid()).get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
@@ -355,21 +365,13 @@ public class UserManager implements UserHistoryUpdateDelegate {
                         try {
                             UserHistory userHistory = new UserHistory(data, id);
                             Step step = userHistory.step.get();
-                            if (step != null) {
-                                Log.d("ifStepNotNullAddUserHistory", step.id);
-                                Doc doc = step.doc.get();
-                                existDocs.add(doc);
-                                UserManager.shared.userHistory.put(step.id, userHistory);
-                            } else {
-                                Log.d("ifStepNotNullAddUserHistory", "Step is null");
-                            }
+                            addUserHistory(step, userHistory);
 
                         } catch (Exception e) {
                             Log.d("Catch", e.getLocalizedMessage());
                         }
                     }
-
-                    AppDelegate.shared.UserHistoryDidCheckingUpdates();
+                    NetworkManager.shared.networkManagerDidDownloadData(null, activity);
                 } else {
                     NetworkManager.shared.networkManagerDidDownloadData("Error When Downloading User Historys", activity);
                 }
@@ -377,51 +379,41 @@ public class UserManager implements UserHistoryUpdateDelegate {
         });
     }
 
-    @Override
-    public void didUpdateUserHistory(Context activity) {
-        AppDelegate.shared.applicationDidFinisheLogin(activity, UserManager.shared);
-    }
-
     //handling user first login
-    public void checkIfUserFirstLogin(Context activity) {
+    public boolean checkIfUserFirstLogin(Context activity) {
         Uri PhotoUrl = getCurrentUser().getPhotoUrl();
-        if (getCurrentUser().getDisplayName() == "" || getCurrentUser().getPhotoUrl() == null) {
-            Intent i = new Intent(activity, InitializeUserActivity.class);
-            activity.startActivity(i);
-        } else {
-            checkIfUserEmailVarified(activity);
-        }
+        return getCurrentUser().getDisplayName() == "" || getCurrentUser().getPhotoUrl() == null;
     }
 
-    public void checkIfUserEmailVarified(final Context activity) {
-        if (getCurrentUser().isEmailVerified()) {
-            AppDelegate.shared.applicationDidInitializeUser(activity, this);
-        } else {
-            UserManager.getCurrentUser().sendEmailVerification().addOnCompleteListener(new OnCompleteListener<Void>() {
-                @Override
-                public void onComplete(@NonNull Task<Void> task) {
-                    if (task.isSuccessful()) {
-                        AlertDialog.Builder dlgAlert  = new AlertDialog.Builder(activity);
-                        dlgAlert.setMessage("A email has sent to your email address");
-                        dlgAlert.setTitle("Email Verification");
-                        dlgAlert.setPositiveButton("I receive the email",
-                                new DialogInterface.OnClickListener() {
-                                    public void onClick(DialogInterface dialog, int which) {
-                                        UserManager.shared.checkIfUserEmailVarified(activity);
-                                    }
-                                });
-                        dlgAlert.setNegativeButton("Sign out",
-                                new DialogInterface.OnClickListener() {
-                                    public void onClick(DialogInterface dialog, int which) {
-                                        AppDelegate.shared.applicationDidReportException("Email is not verified");
-                                    }
-                                });
-                        dlgAlert.setCancelable(true);
-                        dlgAlert.create().show();
-                    }
+    public boolean checkIfUserEmailVerified(final Context activity) {
+        return getCurrentUser().isEmailVerified();
+    }
+
+    public void verifyEmail(final Context activity){
+        UserManager.getCurrentUser().sendEmailVerification().addOnCompleteListener(new OnCompleteListener<Void>() {
+            @Override
+            public void onComplete(@NonNull Task<Void> task) {
+                if (task.isSuccessful()) {
+                    AlertDialog.Builder dlgAlert  = new AlertDialog.Builder(activity);
+                    dlgAlert.setMessage("A email has sent to your email address");
+                    dlgAlert.setTitle("Email Verification");
+                    dlgAlert.setPositiveButton("I receive the email",
+                            new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialog, int which) {
+                                    AppDelegate.shared.applicationLaunchingProcessDidFinishedCurrentTask(activity);
+                                }
+                            });
+                    dlgAlert.setNegativeButton("Sign out",
+                            new DialogInterface.OnClickListener() {
+                                public void onClick(DialogInterface dialog, int which) {
+                                    AppDelegate.shared.applicationDidReportException("Email is not verified");
+                                }
+                            });
+                    dlgAlert.setCancelable(true);
+                    dlgAlert.create().show();
                 }
-            });
-        }
+            }
+        });
     }
 
     private static boolean checkEmail(String email) {

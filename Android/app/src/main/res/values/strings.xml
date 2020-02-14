@@ -61,8 +61,18 @@
 
     //Step
     <string name="step_button_next">Next</string>
+    <string name="step_button_next_finish">Finish</string>
     <string name="step_button_prev">Previous</string>
+    <string name="step_button_submit">Submit</string>
 
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
+
+    <string name="web_client_id">854633007097-mcg4jcedqugpjeg18m8bcrcdinc903pq.apps.googleusercontent.com</string>
+    <string name="web_project_id">cell-app</string>
+    <string name="web_auth_uri">https://accounts.google.com/o/oauth2/auth</string>
+    <string name="web_token_uri">https://oauth2.googleapis.com/token</string>
+    <string name="web_auth_provider_x509_cert_url">https://www.googleapis.com/oauth2/v1/certs</string>
+    <string name="web_client_secret">jJ5ZZvBbm8EOunUUDqfWZ2rx</string>
+
 </resources>
