@@ -14,6 +14,7 @@ import {
 import React from "react";
 import FileUploader from "react-firebase-file-uploader";
 import firebase from "firebase";
+import em from "../../constants/enumerator"
 
 class StepDetail extends React.Component {
   constructor(props) {
@@ -22,10 +23,10 @@ class StepDetail extends React.Component {
 
   render() {
     const typeOptions = [
-      { key: "interactive", text: `Interactive Animation`, value: 0 },
-      { key: "auto", text: `Auto Animation`, value: 1 },
-      { key: "choice_quiz", text: `Multiple Choice`, value: 10 },
-      { key: "fill_quiz", text: `Fill Blanks`, value: 11 }
+      { key: "interactive", text: `Interactive Animation`, value: em.StepType.INTERACTIVE },
+      { key: "auto", text: `Auto Animation`, value: em.StepType.AUTO },
+      { key: "choice_quiz", text: `Multiple Choice`, value: em.StepType.CHOICE_QUIZ },
+      { key: "fill_quiz", text: `Fill Blanks`, value: em.StepType.FILL_QUIZ }
     ];
     console.log("topicList", this.props);
     const documentOptions = Object.values(this.props.documentList)
@@ -151,7 +152,7 @@ class StepDetail extends React.Component {
 
                 {/* Choice TextField */}
 
-                {this.props.step.TYPE == 10 ? (
+                {this.props.step.TYPE === em.StepType.CHOICE_QUIZ ? (
                   <Form.Field
                     id="step-detail-choices-area"
                     control={TextArea}
@@ -162,29 +163,29 @@ class StepDetail extends React.Component {
                     }.bind(this)}
                   />
                 ) : (
-                  " "
+                  <div />
                 )}
 
                 {/* Answer TextField */}
 
-                {this.props.step.TYPE == 10 || this.props.step.TYPE == 11 ? (
+                {this.props.step.TYPE === em.StepType.CHOICE_QUIZ || this.props.step.TYPE === em.StepType.FILL_QUIZ ? (
                   <Form.Field
                     id="step-detail-answer-area"
                     control={TextArea}
                     label="Answer"
-                    disabled={this.props.step.TYPE == 10}
+                    disabled={this.props.step.TYPE === em.StepType.CHOICE_QUIZ}
                     value={this.props.step.ANSWER}
                     onChange={function(e, { value }) {
                       this.props.setKeyValue("ANSWER", value);
                     }.bind(this)}
                   />
                 ) : (
-                  " "
+                  <div />
                 )}
 
                 {/* Answer Explanation */}
 
-                {this.props.step.TYPE == 10 || this.props.step.TYPE == 11 ? (
+                {this.props.step.TYPE === em.StepType.CHOICE_QUIZ || this.props.step.TYPE === em.StepType.FILL_QUIZ ? (
                   <Form.Field
                     id="step-detail-answer-explanation-area"
                     control={TextArea}
@@ -195,12 +196,12 @@ class StepDetail extends React.Component {
                     }.bind(this)}
                   />
                 ) : (
-                  " "
+                  <div />
                 )}
 
                 {/* Multiple Choice Preview Area */}
 
-                {this.props.step.TYPE == 10 && this.props.step.CHOICES ? (
+                {this.props.step.TYPE === em.StepType.CHOICE_QUIZ && this.props.step.CHOICES ? (
                   <div style={{ paddingBottom: "0.5em" }}>
                     <Form.Field
                       id="step-detail-choice-field"
@@ -237,7 +238,7 @@ class StepDetail extends React.Component {
                       ))}
                   </div>
                 ) : (
-                  " "
+                  <div />
                 )}
 
                 {/* Step Image */}
@@ -252,7 +253,7 @@ class StepDetail extends React.Component {
                     />
                   </Segment>
                 ) : (
-                  " "
+                  <div />
                 )}
                 {this.props.isUploading ? (
                   <Progress

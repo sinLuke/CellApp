@@ -9,8 +9,10 @@ import AnimationDetail from "./animationDetail";
 class Home extends React.Component {
   constructor(props) {
     super(props);
+    console.log(firebase.auth().currentUser)
     this.state = {
-      user: firebase.auth().currentUser,
+      loading: true,
+      user: null,
       admin: false,
       topic: null,
       document: null,
@@ -19,21 +21,25 @@ class Home extends React.Component {
     };
 
     firebase.auth().onAuthStateChanged(
-      function(user) {
+      (user) => {
+        console.log(user)
         if (user) {
-          this.setState({ user: user });
           if (user.email) {
             this.setState({
+              user: user,
+              loading: false,
               admin:
                 firebase.auth().currentUser.email === "yinluke@gmail.com" ||
                 firebase.auth().currentUser.email === "patelks2394@gmail.com" ||
                 firebase.auth().currentUser.email === "yinaiguo@gmail.com"
             });
+          } else {
+            this.setState({ loading: false, user: null });
           }
         } else {
-          this.setState({ user: null });
+          this.setState({ loading: false, user: null });
         }
-      }.bind(this)
+      }
     );
     this.filterDocumentList = this.filterDocumentList.bind(this);
     this.filterStepList = this.filterStepList.bind(this);
@@ -59,7 +65,13 @@ class Home extends React.Component {
   }
 
   render() {
+
+    if (this.state.loading) {
+      return <h1>Loading ...</h1>
+    }
+
     if (!this.state.user) {
+      console.log("!this.state.user)")
       return <Redirect to="/" />;
     }
 
@@ -111,7 +123,7 @@ class Home extends React.Component {
                 />
               </Grid.Column>
             ) : (
-              " "
+              <div />
             )}
 
             {this.props.topicSelected && !this.props.editAnimation ? (
@@ -153,7 +165,7 @@ class Home extends React.Component {
                 />
               </Grid.Column>
             ) : (
-              " "
+              <div />
             )}
 
             {this.props.documentSelected ? (
@@ -187,7 +199,7 @@ class Home extends React.Component {
                 />
               </Grid.Column>
             ) : (
-              " "
+              <div />
             )}
 
             {this.props.editAnimation ? (
@@ -212,7 +224,7 @@ class Home extends React.Component {
                 />
               </Grid.Column>
             ) : (
-              " "
+              <div />
             )}
 
             {this.props.editAnimation && this.props.stepSelected ? (

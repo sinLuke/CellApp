@@ -20,8 +20,8 @@ class Navigation extends React.Component {
             Sign Out
           </Link>
         </Menu.Item>
-        <Menu.Item to={ROUTES.HOME}>
-          <Link>Home</Link>
+        <Menu.Item>
+          <Link to={ROUTES.HOME}>Home</Link>
         </Menu.Item>
       </Menu>
     );

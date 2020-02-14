@@ -23,7 +23,7 @@ class AnimationStepDetail extends React.Component {
     console.log("topicList", this.props);
     const documentOptions = Object.values(this.props.documentList)
       .map(
-        function(document) {
+        function (document) {
           if (this.props.topicList[document.TOPIC_ID]) {
             return {
               key: document.id,
@@ -39,7 +39,7 @@ class AnimationStepDetail extends React.Component {
           }
         }.bind(this)
       )
-      .sort(function(a, b) {
+      .sort(function (a, b) {
         if (a.text > b.text) {
           return -1;
         }
@@ -55,7 +55,7 @@ class AnimationStepDetail extends React.Component {
           <Table.Row>
             <Table.HeaderCell>Animations - {this.props.title}</Table.HeaderCell>
             <Table.HeaderCell verticalAlign="middle">
-              Start{" "}
+              Start
               <Checkbox
                 style={{
                   paddingTop: "4px",
@@ -65,7 +65,7 @@ class AnimationStepDetail extends React.Component {
                 slider
                 value={this.state.start}
                 onChange={this.changeStartEnd}
-              />{" "}
+              />
               End
             </Table.HeaderCell>
           </Table.Row>
@@ -95,6 +95,15 @@ class AnimationStepDetail extends React.Component {
                       return item.STEP_ID === this.props.item.STEP_ID;
                     })}
                     onControlledDragStop={(e, x, y) => {
+
+                      if (x.isNaN) {
+                        x = 0
+                      }
+
+                      if (y.isNaN) {
+                        y = 0
+                      }
+
                       if (this.state.start) {
                         this.props.setKeyValue("START_POSITION_X", x);
                         this.props.setKeyValue("START_POSITION_Y", y);
@@ -119,7 +128,7 @@ class AnimationStepDetail extends React.Component {
                     control={Input}
                     label="Description"
                     value={this.props.item.DESCRIPTION}
-                    onChange={function(e, { value }) {
+                    onChange={function (e, { value }) {
                       this.props.setKeyValue("DESCRIPTION", value);
                     }.bind(this)}
                   />
@@ -127,14 +136,14 @@ class AnimationStepDetail extends React.Component {
                     id="animation-item-detail-size-field"
                     control={Input}
                     label="Size"
-                    value={function() {
+                    value={function () {
                       if (isNaN(this.props.item.SIZE)) {
                         return "10";
                       } else {
                         return this.props.item.SIZE;
                       }
                     }.bind(this)()}
-                    onChange={function(e, { value }) {
+                    onChange={function (e, { value }) {
                       this.props.setKeyValue("SIZE", value);
                     }.bind(this)}
                   />

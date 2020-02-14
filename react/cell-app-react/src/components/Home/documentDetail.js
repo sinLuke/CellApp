@@ -134,7 +134,7 @@ class DocumentDetail extends React.Component {
                     />
                   </Segment>
                 ) : (
-                  " "
+                  <div />
                 )}
                 {this.props.isUploading ? (
                   <Progress

@@ -82,7 +82,7 @@ class TopicDetail extends React.Component {
                     />
                   </Segment>
                 ) : (
-                  " "
+                  <div />
                 )}
                 {this.props.isUploading ? (
                   <Progress

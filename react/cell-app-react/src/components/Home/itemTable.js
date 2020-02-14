@@ -59,12 +59,12 @@ class ItemTable extends React.Component {
             {this.props.type === 3 ? (
               <Table.HeaderCell>Edit</Table.HeaderCell>
             ) : (
-              " "
+              (null)
             )}
           </Table.Row>
         </Table.Header>
 
-        <Table.Body padded>
+        <Table.Body>
           {this.props.items.map(item => (
             <Table.Row
               style={{ cursor: "pointer" }}
@@ -101,7 +101,7 @@ class ItemTable extends React.Component {
                 {this.props.changed.has(item.id) ? (
                   <Icon name="dot circle outline" />
                 ) : (
-                  " "
+                  (null)
                 )}
                 {this.getCellContent(item)}
               </Table.Cell>
@@ -150,7 +150,7 @@ class ItemTable extends React.Component {
                   )}
                 </Table.Cell>
               ) : (
-                " "
+                (null)
               )}
             </Table.Row>
           ))}
