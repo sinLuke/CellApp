@@ -9,6 +9,7 @@ import android.util.Log;
 
 import com.cellgroup.cellapp.AppDelegate;
 import com.cellgroup.cellapp.PrettyPrintingMap;
+import com.cellgroup.cellapp.Print;
 import com.cellgroup.cellapp.R;
 import com.cellgroup.cellapp.models.Doc;
 import com.cellgroup.cellapp.models.DocumentCompleteRate;
@@ -386,32 +387,42 @@ public class UserManager {
     }
 
     public boolean checkIfUserEmailVerified(final Context activity) {
+        Print.print(getCurrentUser().isEmailVerified());
         return getCurrentUser().isEmailVerified();
     }
 
     public void verifyEmail(final Context activity){
+        Print.print("verifyEmail");
         UserManager.getCurrentUser().sendEmailVerification().addOnCompleteListener(new OnCompleteListener<Void>() {
             @Override
             public void onComplete(@NonNull Task<Void> task) {
+                AlertDialog.Builder dlgAlert  = new AlertDialog.Builder(activity);
+                Print.print("sendEmailVerification");
+                dlgAlert.setTitle("Email Verification");
+
+                dlgAlert.setNegativeButton("Sign out",
+                        new DialogInterface.OnClickListener() {
+                            public void onClick(DialogInterface dialog, int which) {
+                                dialog.dismiss();
+                                signOut();
+                                AppDelegate.shared.applicationDidReportException("Email is not verified");
+                            }
+                        });
                 if (task.isSuccessful()) {
-                    AlertDialog.Builder dlgAlert  = new AlertDialog.Builder(activity);
                     dlgAlert.setMessage("A email has sent to your email address");
-                    dlgAlert.setTitle("Email Verification");
                     dlgAlert.setPositiveButton("I receive the email",
                             new DialogInterface.OnClickListener() {
                                 public void onClick(DialogInterface dialog, int which) {
+                                    dialog.dismiss();
                                     AppDelegate.shared.applicationLaunchingProcessDidFinishedCurrentTask(activity);
                                 }
                             });
-                    dlgAlert.setNegativeButton("Sign out",
-                            new DialogInterface.OnClickListener() {
-                                public void onClick(DialogInterface dialog, int which) {
-                                    AppDelegate.shared.applicationDidReportException("Email is not verified");
-                                }
-                            });
-                    dlgAlert.setCancelable(true);
-                    dlgAlert.create().show();
+                } else {
+                    dlgAlert.setMessage("Your email has not been verified yet. Please try again later. " + task.getException().getLocalizedMessage());
                 }
+
+                dlgAlert.setCancelable(true);
+                dlgAlert.create().show();
             }
         });
     }
@@ -426,5 +437,9 @@ public class UserManager {
         void newUserDidFinishCreated(FirebaseUser newUser);
         void userDidLogedIn(FirebaseUser user);
         void TaskFinished(String conformMessage);
+    }
+
+    public void signOut() {
+        mAuth.signOut();
     }
 }

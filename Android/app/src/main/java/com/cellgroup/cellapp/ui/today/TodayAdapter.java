@@ -21,6 +21,8 @@ import java.util.List;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import static java.lang.Math.min;
+
 public class TodayAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> implements ViewHolderCallBackDelegate {
 
     private boolean mShouldRecieveUserInput;
@@ -30,9 +32,18 @@ public class TodayAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
     }
     private List<Topic> topics;
     private List<Doc> docs;
+    private boolean showAllTopics;
 
     public TodayAdapter(Context activity){
         this.activity = activity;
+    }
+
+    private int getDataCount() {
+        if (showAllTopics) {
+            return 1 + topics.size() + 2;
+        } else {
+            return 1 + min(topics.size(), 5) + 2;
+        }
     }
 
     public void onUpdateData(){
@@ -68,15 +79,15 @@ public class TodayAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
     public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
         if (holder.getClass().isAssignableFrom(TodayItemHolder.class)) {
             TodayItemHolder todayItemHolder = (TodayItemHolder) holder;
-            Doc doc = docs.get(position - 3);
-            todayItemHolder.bind(doc, getActivity());
+            Topic topic = topics.get(position - 1);
+            todayItemHolder.bind(topic, getActivity());
 
         } else if (holder.getClass().isAssignableFrom(TodayGroupTitleHolder.class)) {
             TodayGroupTitleHolder todayGroupTitleHolder = (TodayGroupTitleHolder) holder;
             if (position == 0) {
-                todayGroupTitleHolder.bind("Topics", getActivity());
+                todayGroupTitleHolder.bind("Topics", false, !showAllTopics, getActivity());
             } else {
-                todayGroupTitleHolder.bind("Recently Viewed", getActivity());
+                todayGroupTitleHolder.bind("Recently Viewed", true, true, getActivity());
             }
         } else if (holder.getClass().isAssignableFrom(TodayTopicContainerHolder.class)) {
             TodayTopicContainerHolder todayTopicContainerHolder = (TodayTopicContainerHolder) holder;
@@ -87,14 +98,14 @@ public class TodayAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
 
     @Override
     public int getItemCount() {
-        return 1 + docs.size() + 2;
+        return getDataCount();
     }
 
     @Override
     public int getItemViewType(int position) {
-        if (position == 0 || position == 2) {
+        if (position == 0 || position == getDataCount() - 2) {
             return 0;
-        } else if (position == 1){
+        } else if (position == getDataCount() - 1){
             return 2;
         } else {
             return 1;
@@ -102,12 +113,16 @@ public class TodayAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
     }
 
     @Override
-    public void holderDidCallFromItemPosition(RecyclerView.ViewHolder holder, int position) {
+    public void holderOnClickFromItemPosition(RecyclerView.ViewHolder holder, int position) {
+        if (position == 0) {
+            showAllTopics = !showAllTopics;
+            notifyDataSetChanged();
+        }
         return;
     }
 
     @Override
-    public void holderDidCallSendingObject(RecyclerView.ViewHolder holder, Object object) {
+    public void holderOnClickSendingObject(RecyclerView.ViewHolder holder, Object object) {
         if (object.getClass().isAssignableFrom(Doc.class)) {
             Doc doc = (Doc) object;
             AppState.shared.setCurrentDoc(doc);

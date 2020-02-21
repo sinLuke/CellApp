@@ -83,7 +83,7 @@ public class TodayAllTopicsTopicItemHolder extends RecyclerView.ViewHolder imple
         if (callBackDelegate.holderShouldRecieveUserInput()) {
             itemView.setBackgroundColor(Color.LTGRAY);
             if (this.topic != null && this.topic.get() != null) {
-                callBackDelegate.holderDidCallSendingObject(this, this.topic.get());
+                callBackDelegate.holderOnClickSendingObject(this, this.topic.get());
             }
         }
     }

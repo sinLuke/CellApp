@@ -75,4 +75,5 @@
     <string name="web_auth_provider_x509_cert_url">https://www.googleapis.com/oauth2/v1/certs</string>
     <string name="web_client_secret">jJ5ZZvBbm8EOunUUDqfWZ2rx</string>
 
+    <string name="server_client_id">854633007097-mcg4jcedqugpjeg18m8bcrcdinc903pq.apps.googleusercontent.com</string>
 </resources>

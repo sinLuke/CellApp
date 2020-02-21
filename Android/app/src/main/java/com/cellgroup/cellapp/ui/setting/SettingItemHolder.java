@@ -8,6 +8,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.cellgroup.cellapp.Print;
 import com.cellgroup.cellapp.R;
 import com.cellgroup.cellapp.network.UserManager;
 import com.cellgroup.cellapp.ui.ViewHolderCallBackDelegate;
@@ -16,10 +17,12 @@ import androidx.recyclerview.widget.RecyclerView;
 
 public class SettingItemHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
+    private Context mActivity;
     private TextView mainTextView;
     private TextView secondaryTextView;
     private TextView middleTextView;
     private ImageView disclosureImage;
+    private View backgroundView;
     private ViewHolderCallBackDelegate callBackDelegate;
     private int position;
     private int type = 0;
@@ -27,7 +30,7 @@ public class SettingItemHolder extends RecyclerView.ViewHolder implements View.O
     public SettingItemHolder(LayoutInflater inflater, ViewGroup parent, ViewHolderCallBackDelegate pCallBackDelegate) {
         super(inflater.inflate(R.layout.list_item_setting, parent, false));
         callBackDelegate = pCallBackDelegate;
-
+        backgroundView = itemView.findViewById(R.id.setting_list_background_view);
         mainTextView = itemView.findViewById(R.id.setting_list_main_title);
         secondaryTextView = itemView.findViewById(R.id.setting_list_secondary_title);
         middleTextView = itemView.findViewById(R.id.setting_list_middle_title);
@@ -36,6 +39,8 @@ public class SettingItemHolder extends RecyclerView.ViewHolder implements View.O
     }
 
     public void bind(int pPosition, Context activity) {
+        mActivity = activity;
+        backgroundView.setBackgroundColor(mActivity.getColor(R.color.systemBackground));
         switch (pPosition) {
             case 0:
                 break;
@@ -97,9 +102,11 @@ public class SettingItemHolder extends RecyclerView.ViewHolder implements View.O
 
     @Override
     public void onClick(View v) {
+        Print.print("OnClick");
         if (callBackDelegate.holderShouldRecieveUserInput()) {
-            itemView.setBackgroundColor(Color.GRAY);
-            callBackDelegate.holderDidCallFromItemPosition(this, position);
+            Print.print("holderShouldRecieveUserInput");
+            backgroundView.setBackgroundColor(mActivity.getColor(R.color.systemFill));
+            callBackDelegate.holderOnClickFromItemPosition(this, position);
         }
     }
 }

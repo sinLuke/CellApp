@@ -22,7 +22,7 @@ import com.cellgroup.cellapp.ui.login.InitializeUserFragment;
 
 public class TopicFragment extends Fragment {
 
-    private RecyclerView todayRecyclerView;
+    private RecyclerView topicRecyclerView;
     private TopicAdapter adapter;
     private boolean mShouldRecieveUserInput;
 
@@ -42,10 +42,10 @@ public class TopicFragment extends Fragment {
 
         View v = inflater.inflate(R.layout.fragment_today, container, false);
 
-        todayRecyclerView = v.findViewById(R.id.today_recycler_view);
+        topicRecyclerView = v.findViewById(R.id.today_recycler_view);
         RecyclerView.LayoutManager layoutManager = new GridLayoutManager(getActivity(), 3, RecyclerView.VERTICAL, false);
 
-        todayRecyclerView.setLayoutManager(layoutManager);
+        topicRecyclerView.setLayoutManager(layoutManager);
         updateUI();
 
         return v;
@@ -61,7 +61,7 @@ public class TopicFragment extends Fragment {
     private void updateUI(){
         if (adapter == null) {
             adapter = new TopicAdapter(getActivity());
-            todayRecyclerView.setAdapter(adapter);
+            topicRecyclerView.setAdapter(adapter);
             getActivity().setTitle(AppState.shared.getCurrentTopic().TOPIC_NAME);
         } else {
             adapter.notifyDataSetChanged();

@@ -4,6 +4,8 @@ import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
 
+import com.cellgroup.cellapp.AppDelegate;
+import com.cellgroup.cellapp.Print;
 import com.cellgroup.cellapp.network.UserManager;
 import com.cellgroup.cellapp.ui.ViewHolderCallBackDelegate;
 
@@ -66,8 +68,8 @@ public class SettingAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
     }
 
     @Override
-    public void holderDidCallFromItemPosition(RecyclerView.ViewHolder holder, int position) {
-
+    public void holderOnClickFromItemPosition(RecyclerView.ViewHolder holder, int position) {
+        Print.print("holderDidCallFromItemPosition", position);
         switch (position) {
             case 0:
                 break;
@@ -99,12 +101,13 @@ public class SettingAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder
                 break;
             default:
                 UserManager.signOutCurrentUser(getActivity());
+                AppDelegate.shared.applicationLaunchingProcessDidFinishedCurrentTask(getActivity());
         }
         mShouldRecieveUserInput = false;
     }
 
     @Override
-    public void holderDidCallSendingObject(RecyclerView.ViewHolder holder, Object object) {
+    public void holderOnClickSendingObject(RecyclerView.ViewHolder holder, Object object) {
         return;
     }
 

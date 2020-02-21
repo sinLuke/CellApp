@@ -90,7 +90,7 @@ public class TopicDocumentItemHolder extends RecyclerView.ViewHolder implements 
         if (callBackDelegate.holderShouldRecieveUserInput()) {
             itemView.setBackgroundColor(Color.LTGRAY);
             if (this.doc != null && this.doc.get() != null) {
-                callBackDelegate.holderDidCallSendingObject(this, this.doc.get());
+                callBackDelegate.holderOnClickSendingObject(this, this.doc.get());
             }
         }
     }

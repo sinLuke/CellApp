@@ -27,10 +27,15 @@ public class AppDelegate {
     public NetworkManager sharedNetworkManager;
     public UserManager sharedUserManager;
 
+    private boolean launched = false;
+
     private void AppDelegate(){return;}
 
     public void applicationDidlaunched(Context activity) {
-        applicationLaunchingProcessDidFinishedCurrentTask(activity);
+        if (!launched) {
+            shared.applicationLaunchingProcessDidFinishedCurrentTask(activity);
+            launched = true;
+        }
     }
 
     public void applicationLaunchingProcessDidFinishedCurrentTask(Context activity) {

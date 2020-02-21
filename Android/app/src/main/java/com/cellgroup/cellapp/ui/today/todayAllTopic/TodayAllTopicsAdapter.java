@@ -60,12 +60,12 @@ public class TodayAllTopicsAdapter extends RecyclerView.Adapter<RecyclerView.Vie
     }
 
     @Override
-    public void holderDidCallFromItemPosition(RecyclerView.ViewHolder holder, int position) {
+    public void holderOnClickFromItemPosition(RecyclerView.ViewHolder holder, int position) {
         return;
     }
 
     @Override
-    public void holderDidCallSendingObject(RecyclerView.ViewHolder holder, Object object) {
+    public void holderOnClickSendingObject(RecyclerView.ViewHolder holder, Object object) {
         if (object.getClass().isAssignableFrom(Doc.class)) {
             Doc doc = (Doc) object;
             AppState.shared.setCurrentDoc(doc);
