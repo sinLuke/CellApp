@@ -1,18 +1,15 @@
 package com.cellgroup.cellapp;
 
-import android.app.Activity;
-
 import android.content.Context;
 import android.content.Intent;
-import android.database.sqlite.SQLiteDatabase;
-import android.net.Network;
 import android.widget.Toast;
+
+import androidx.appcompat.app.AppCompatActivity;
 
 import com.cellgroup.cellapp.network.DataManager;
 import com.cellgroup.cellapp.network.NetworkManager;
 import com.cellgroup.cellapp.network.UserManager;
 import com.cellgroup.cellapp.ui.InitalScreen.InitalScreen;
-import com.cellgroup.cellapp.ui.login.InitializeUserActivity;
 import com.cellgroup.cellapp.ui.login.LoginActivity;
 import com.google.firebase.auth.FirebaseUser;
 
@@ -74,7 +71,7 @@ public class AppDelegate {
         }
     }
 
-    public void applicationMoveToScreenIfNeeded(Class<? extends Activity> activityClass) {
+    public void applicationMoveToScreenIfNeeded(Class<? extends AppCompatActivity> activityClass) {
         if (currentScreen != activityClass.getName()) {
             Intent i = new Intent(currentActivity, activityClass);
             currentActivity.startActivity(i);

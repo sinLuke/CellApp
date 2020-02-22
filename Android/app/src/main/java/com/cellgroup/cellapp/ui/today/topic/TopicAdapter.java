@@ -61,7 +61,12 @@ public class TopicAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
 
     @Override
     public int getItemCount() {
-        return topic.docs.size();
+        if (topic != null) {
+            return topic.docs.size();
+        } else {
+            return 0;
+        }
+
     }
 
 

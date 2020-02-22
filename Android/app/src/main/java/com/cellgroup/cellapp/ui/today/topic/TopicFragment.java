@@ -17,7 +17,9 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.cellgroup.cellapp.AppState;
+import com.cellgroup.cellapp.Print;
 import com.cellgroup.cellapp.R;
+import com.cellgroup.cellapp.models.Topic;
 import com.cellgroup.cellapp.ui.login.InitializeUserFragment;
 
 public class TopicFragment extends Fragment {
@@ -62,8 +64,16 @@ public class TopicFragment extends Fragment {
         if (adapter == null) {
             adapter = new TopicAdapter(getActivity());
             topicRecyclerView.setAdapter(adapter);
-            getActivity().setTitle(AppState.shared.getCurrentTopic().TOPIC_NAME);
+
+            Topic currentTopic = AppState.shared.getCurrentTopic();
+
+            if (currentTopic != null) {
+                getActivity().setTitle(currentTopic.TOPIC_NAME);
+            }
+
+
         } else {
+            Print.print("getCurrentTopic", "else");
             adapter.notifyDataSetChanged();
         }
     }

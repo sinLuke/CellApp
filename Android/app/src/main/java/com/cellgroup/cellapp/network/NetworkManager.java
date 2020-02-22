@@ -5,6 +5,8 @@ import android.content.Context;
 import androidx.annotation.NonNull;
 
 import com.cellgroup.cellapp.AppDelegate;
+import com.cellgroup.cellapp.Timmer;
+import com.cellgroup.cellapp.TimmerDelegate;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.DocumentReference;
@@ -17,6 +19,10 @@ public class NetworkManager {
     private Context context;
     private static FirebaseFirestore firebaseFirestore = FirebaseFirestore.getInstance();
     public static NetworkManager shared;
+
+    private int mRemaining = 0;
+
+
 
     private NetworkManager (Context c) {
         context = c.getApplicationContext();

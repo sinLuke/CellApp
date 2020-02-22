@@ -19,53 +19,34 @@
             android:id="@+id/step_layout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_margin="32dp"
+            android:layout_marginTop="32dp"
+            android:layout_marginBottom="32dp"
             android:divider="@drawable/shared_medium"
             android:showDividers="middle"
             android:paddingBottom="64dp"
             android:orientation="vertical">
 
-            <TextView
-                android:id="@+id/step_document_title"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text=""
-                android:textAppearance="@style/TextAppearance.AppCompat.Large"
-                android:textSize="36sp"
-                android:textStyle="bold"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
 
             <TextView
                 android:id="@+id/step_text"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:textSize="18sp"
+                android:layout_marginTop="64dp"
+                android:layout_marginLeft="32dp"
+                android:layout_marginRight="32dp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/step_document_title" />
+                app:layout_constraintTop_toTopOf="parent" />
 
             <EditText
                 android:id="@+id/step_answer_text"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginLeft="32dp"
+                android:layout_marginRight="32dp"
                 android:textSize="18sp"
             />
-
-            <Button
-                android:id="@+id/submit_button"
-                style="@android:style/Widget.DeviceDefault.Button.Borderless"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:background="@drawable/bk_corner_radius_fill"
-                android:text="@string/step_button_submit"
-                android:textAlignment="center"
-                android:textAllCaps="false"
-                android:textColor="@color/darkText"
-                android:textSize="16sp"
-                android:visibility="visible"
-                tools:visibility="visible" />
 
             <TextView
                 android:id="@+id/step_answer_label"
@@ -73,6 +54,8 @@
                 android:layout_height="wrap_content"
                 android:textColor="@color/label"
                 android:textSize="24sp"
+                android:layout_marginLeft="32dp"
+                android:layout_marginRight="32dp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent" />
 
@@ -82,28 +65,48 @@
                 android:layout_height="wrap_content"
                 android:textColor="@color/secondaryLabel"
                 android:textSize="16sp"
+                android:layout_marginLeft="32dp"
+                android:layout_marginRight="32dp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent" />
 
 
-            <androidx.constraintlayout.widget.ConstraintLayout
+            <RelativeLayout
+                android:id="@+id/step_answer_interactive_canvas"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:layout_constraintTop_toBottomOf="@+id/step_text">
+                app:layout_constraintTop_toBottomOf="@+id/step_text"
+                android:layout_marginLeft="8dp"
+                android:layout_marginRight="8dp">
 
                 <ImageView
                     android:id="@+id/step_image"
                     android:layout_width="match_parent"
-                    android:layout_height="0px"
+                    android:layout_height="wrap_content"
                     android:scaleType="fitCenter"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintDimensionRatio="H,1:1"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent">
+                    android:adjustViewBounds = "true"
+                    android:layout_marginLeft="0dp"
+                    android:layout_marginRight="0dp"
+                    >
 
                 </ImageView>
-            </androidx.constraintlayout.widget.ConstraintLayout>
+            </RelativeLayout>
+
+            <Button
+                android:id="@+id/submit_button"
+                style="@android:style/Widget.DeviceDefault.Button.Borderless"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="32dp"
+                android:layout_marginRight="32dp"
+                android:background="@drawable/bk_corner_radius_fill"
+                android:text="@string/step_button_submit"
+                android:textAlignment="center"
+                android:textAllCaps="false"
+                android:textColor="@color/darkText"
+                android:textSize="16sp"
+                android:visibility="visible"
+                tools:visibility="visible" />
         </LinearLayout>
         >
     </ScrollView>

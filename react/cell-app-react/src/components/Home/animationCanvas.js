@@ -33,11 +33,24 @@ class AnimationCanvas extends React.Component {
             bounds="parent"
             onStop={(e, position) => {
               const { x, y } = position;
-              this.props.onControlledDragStop(
-                e,
-                x / 0.01 / this.state.width,
-                y / 0.01 / this.state.height
-              );
+              let resX = x / 0.01 / this.state.width
+              let resY = y / 0.01 / this.state.height
+
+              if (isNaN(resX) || isNaN(resY)) {
+                this.props.onControlledDragStop(
+                  e,
+                  0,
+                  0
+                ); 
+              } else {
+                this.props.onControlledDragStop(
+                  e,
+                  x / 0.01 / this.state.width,
+                  y / 0.01 / this.state.height
+                );
+              }
+
+              
             }}
             position={{
               x:

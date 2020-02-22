@@ -11,6 +11,8 @@ import com.cellgroup.cellapp.AppDelegate;
 import com.cellgroup.cellapp.PrettyPrintingMap;
 import com.cellgroup.cellapp.Print;
 import com.cellgroup.cellapp.R;
+import com.cellgroup.cellapp.Timmer;
+import com.cellgroup.cellapp.TimmerDelegate;
 import com.cellgroup.cellapp.models.Doc;
 import com.cellgroup.cellapp.models.DocumentCompleteRate;
 import com.cellgroup.cellapp.models.Step;
@@ -23,6 +25,7 @@ import com.google.android.gms.tasks.*;
 import com.google.firebase.auth.*;
 import com.google.firebase.firestore.*;
 
+import java.lang.ref.WeakReference;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -32,8 +35,10 @@ import java.util.Set;
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 
-public class UserManager {
+public class UserManager implements TimmerDelegate {
 
+    private int mRemaining = 0;
+    private WeakReference<AlertDialog> mEmailWaitAlert;
     private static FirebaseAuth mAuth = FirebaseAuth.getInstance();
     private static GoogleSignInOptions gso;
     private static GoogleSignInClient gsc;
@@ -44,6 +49,23 @@ public class UserManager {
     private int currentUserScopte = 0;
     private Map<String, UserHistory> userHistory = new HashMap<>();
     private Set<Doc> existDocs = new HashSet();
+
+    @Override
+    public void tick(int remaining) {
+
+        mRemaining = remaining;
+
+        if (mEmailWaitAlert == null) {return;}
+
+
+        AlertDialog theAlert = mEmailWaitAlert.get();
+        if (theAlert != null) {
+            theAlert.getButton(AlertDialog.BUTTON_POSITIVE).setText("Resend email (" + remaining +")");
+            if (remaining <= 0) {
+                theAlert.getButton(AlertDialog.BUTTON_POSITIVE).setEnabled(true);
+            }
+        }
+    }
 
     private UserManager(UserData userData) {
         currentUserScopte = userData.userScope;
@@ -393,38 +415,67 @@ public class UserManager {
 
     public void verifyEmail(final Context activity){
         Print.print("verifyEmail");
-        UserManager.getCurrentUser().sendEmailVerification().addOnCompleteListener(new OnCompleteListener<Void>() {
-            @Override
-            public void onComplete(@NonNull Task<Void> task) {
-                AlertDialog.Builder dlgAlert  = new AlertDialog.Builder(activity);
-                Print.print("sendEmailVerification");
-                dlgAlert.setTitle("Email Verification");
 
-                dlgAlert.setNegativeButton("Sign out",
-                        new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog, int which) {
-                                dialog.dismiss();
-                                signOut();
-                                AppDelegate.shared.applicationDidReportException("Email is not verified");
-                            }
-                        });
-                if (task.isSuccessful()) {
-                    dlgAlert.setMessage("A email has sent to your email address");
-                    dlgAlert.setPositiveButton("I receive the email",
+        if (mRemaining > 0) {
+            AlertDialog.Builder emailWaitAlert  = new AlertDialog.Builder(activity);
+            emailWaitAlert.setTitle("Email Verification");
+            emailWaitAlert.setMessage("Your email has not been verified yet. Please try again later.");
+            emailWaitAlert.setNegativeButton("Sign out",
+                    new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int which) {
+                            dialog.dismiss();
+                            signOut();
+                            AppDelegate.shared.applicationDidReportException("Email is not verified");
+                        }
+                    });
+            emailWaitAlert.setPositiveButton("Resend email (60)",
+                    new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int which) {
+                            dialog.dismiss();
+                            AppDelegate.shared.applicationLaunchingProcessDidFinishedCurrentTask(activity);
+                        }
+                    });
+            mEmailWaitAlert = new WeakReference(emailWaitAlert.create());
+            mEmailWaitAlert.get().getButton(AlertDialog.BUTTON_POSITIVE).setEnabled(false);
+            mEmailWaitAlert.get().show();
+        } else {
+
+            Timmer t = Timmer.getTimmer(60, this);
+            t.start();
+
+            UserManager.getCurrentUser().sendEmailVerification().addOnCompleteListener(new OnCompleteListener<Void>() {
+                @Override
+                public void onComplete(@NonNull Task<Void> task) {
+                    AlertDialog.Builder dlgAlert = new AlertDialog.Builder(activity);
+
+                    dlgAlert.setTitle("Email Verification");
+
+                    dlgAlert.setNegativeButton("Sign out",
                             new DialogInterface.OnClickListener() {
                                 public void onClick(DialogInterface dialog, int which) {
                                     dialog.dismiss();
-                                    AppDelegate.shared.applicationLaunchingProcessDidFinishedCurrentTask(activity);
+                                    signOut();
+                                    AppDelegate.shared.applicationDidReportException("Email is not verified");
                                 }
                             });
-                } else {
-                    dlgAlert.setMessage("Your email has not been verified yet. Please try again later. " + task.getException().getLocalizedMessage());
-                }
+                    if (task.isSuccessful()) {
+                        dlgAlert.setMessage("A email has sent to your email address");
+                        dlgAlert.setPositiveButton("I receive the email",
+                                new DialogInterface.OnClickListener() {
+                                    public void onClick(DialogInterface dialog, int which) {
+                                        dialog.dismiss();
+                                        AppDelegate.shared.applicationLaunchingProcessDidFinishedCurrentTask(activity);
+                                    }
+                                });
+                    } else {
+                        dlgAlert.setMessage("Your email has not been verified yet. Please try again later. " + task.getException().getLocalizedMessage());
+                    }
 
-                dlgAlert.setCancelable(true);
-                dlgAlert.create().show();
-            }
-        });
+                    dlgAlert.setCancelable(true);
+                    dlgAlert.create().show();
+                }
+            });
+        }
     }
 
     private static boolean checkEmail(String email) {

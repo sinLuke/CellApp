@@ -3,6 +3,7 @@ package com.cellgroup.cellapp.network;
 import android.content.Context;
 
 import com.cellgroup.cellapp.AppDelegate;
+import com.cellgroup.cellapp.Print;
 import com.cellgroup.cellapp.models.*;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -173,7 +174,7 @@ public class DataManager {
                             DataManager.this.animationItems.put(id, animationItem);
                             animationItem.step.get().addAnimationItem(animationItem);
                         } catch (Exception e) {
-
+                            Print.print(e.getLocalizedMessage());
                         }
                     }
                     DataManager.this.finishDownloads(activity);

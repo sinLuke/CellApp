@@ -102,10 +102,10 @@ function add(collection, parent, state, callback) {
       collectionName = "ANIMATION_ITEM";
       item = {
         DESCRIPTION: "New Animation Item",
-        END_POSITION_X: 0.0,
-        END_POSITION_Y: 0.0,
-        START_POSITION_X: 0.0,
-        START_POSITION_Y: 0.0,
+        END_POSITION_X: 0.5,
+        END_POSITION_Y: 0.5,
+        START_POSITION_X: 0.5,
+        START_POSITION_Y: 0.5,
         IMAGE_URL: null,
         SIZE: 10,
         STEP_ID: parent,

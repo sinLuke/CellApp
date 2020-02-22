@@ -136,16 +136,17 @@ class AnimationStepDetail extends React.Component {
                     id="animation-item-detail-size-field"
                     control={Input}
                     label="Size"
-                    value={function () {
+                    value={(() => {
                       if (isNaN(this.props.item.SIZE)) {
                         return "10";
                       } else {
                         return this.props.item.SIZE;
                       }
-                    }.bind(this)()}
-                    onChange={function (e, { value }) {
-                      this.props.setKeyValue("SIZE", value);
-                    }.bind(this)}
+                    })()}
+                    onChange={(e, { value }) => {
+                      let intValue = parseInt(value)
+                      this.props.setKeyValue("SIZE", intValue);
+                    }}
                   />
                 </Form.Group>
               </Form>

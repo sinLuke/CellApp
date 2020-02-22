@@ -9,6 +9,7 @@ import android.os.PersistableBundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.cellgroup.cellapp.AppState;
@@ -41,19 +42,19 @@ public class StepPagerActivity extends RootActivity implements ViewPagerDelegate
 
     private Button nextButton;
     private Button prevButton;
-
+    private TextView stepNumberText;
     private String thisAnswer;
 
     @Override
     public boolean pageViewShouldContinueScrolling(ViewPagerWithDelegate viewPager) {
         int current = viewPager.getCurrentItem();
-        return !(steps.get(current).isQuiz() || steps.get(current).isInteractive());
+        return !(steps.get(current).isQuiz() || steps.get(current).isAnimation());
     }
 
     @Override
     public void didFinishStepCorrectly(Step step) {
         AppState.shared.setStepFinished(step);
-        if (step.isQuiz() || step.isInteractive()) {
+        if (step.isQuiz() || step.animationItems.size() > 0) {
             StepPagerActivity.this.nextButton.setVisibility(View.VISIBLE);
             StepPagerActivity.this.nextButton.setBackground(getResources().getDrawable(R.drawable.bk_corner_radius_blue));
             StepPagerActivity.this.nextButton.setTextColor(getResources().getColor(R.color.label_dark));
@@ -85,10 +86,21 @@ public class StepPagerActivity extends RootActivity implements ViewPagerDelegate
     }
 
     public void updateButtons(int position){
+
+        Step step = steps.get(position);
+
+        if (position == step.PAGE_NUMBER) {
+            stepNumberText.setText((position + 1) + "/" + step.doc.get().steps.size());
+        } else {
+            stepNumberText.setText("(" + step.PAGE_NUMBER + ") " + (position + 1) + "/" + step.doc.get().steps.size());
+        }
+
         StepPagerActivity.this.nextButton.setVisibility(View.VISIBLE);
         StepPagerActivity.this.prevButton.setVisibility(View.VISIBLE);
+        StepPagerActivity.this.prevButton.setBackground(getResources().getDrawable(R.drawable.bk_corner_white_fill));
+        StepPagerActivity.this.prevButton.setTextColor(getResources().getColor(R.color.label));
 
-        if (steps.get(position).isQuiz() || steps.get(position).isInteractive()) {
+        if (steps.get(position).isQuiz() || steps.get(position).isAnimation()) {
             StepPagerActivity.this.nextButton.setVisibility(View.GONE);
         }
 
@@ -115,6 +127,8 @@ public class StepPagerActivity extends RootActivity implements ViewPagerDelegate
         viewPager = findViewById(R.id.step_view_page);
         nextButton = findViewById(R.id.next_button);
         prevButton = findViewById(R.id.prev_button);
+        stepNumberText = findViewById(R.id.step_number_text);
+
         steps = new ArrayList<>(AppState.shared.getCurrentDoc().steps.values());
 
         viewPager.delegate = this;
@@ -166,7 +180,7 @@ public class StepPagerActivity extends RootActivity implements ViewPagerDelegate
         viewPager.addOnPageChangeListener(new ViewPagerWithDelegate.OnPageChangeListener() {
             @Override
             public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
-                Log.d("scroll", "onPageScrolled, position:" + Integer.toString(position));
+
             }
 
             @Override
