@@ -16,6 +16,7 @@ import com.google.firebase.auth.FirebaseUser;
 public class AppDelegate {
 
     private int RC_SIGN_IN = 0;
+    private Boolean ShouldAskLoginInfomation = false;
 
     public static AppDelegate shared = new AppDelegate();
     public String currentScreen = InitalScreen.class.getName();
@@ -38,13 +39,18 @@ public class AppDelegate {
     public void applicationLaunchingProcessDidFinishedCurrentTask(Context activity) {
         currentActivity = activity;
         FirebaseUser user = UserManager.getCurrentUser();
-        if (user == null) {
+        if (user == null && ShouldAskLoginInfomation) {
             Intent i = new Intent(currentActivity, LoginActivity.class);
             currentActivity.startActivity(i);
             return;
         }
         if (sharedUserManager == null) {
-            UserManager.getUserManager(user, activity);
+            if (ShouldAskLoginInfomation) {
+                UserManager.getUserManager(user, activity);
+            } else {
+                UserManager.getUserManager(activity);
+            }
+
             return;
         }
 //        if (!sharedUserManager.checkIfUserFirstLogin(activity)) {

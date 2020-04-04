@@ -43,7 +43,10 @@ public class TodayItemHolder extends RecyclerView.ViewHolder implements View.OnC
 
     public void bind(Topic topic, Context activity) {
         mainTextView.setText(activity.getText(R.string.setting_change_display_name));
-        secondaryTextView.setText(UserManager.getCurrentUser().getDisplayName());
+        if (UserManager.getCurrentUser() != null) {
+            secondaryTextView.setText(UserManager.getCurrentUser().getDisplayName());
+        }
+
         itemView.setBackgroundColor(Color.TRANSPARENT);
         if (topic != null) {
             this.topic = new WeakReference<>(topic);

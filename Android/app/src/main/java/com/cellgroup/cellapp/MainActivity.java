@@ -47,9 +47,13 @@ public class MainActivity extends RootActivity {
         userNameTextView = navigationView.getHeaderView(0).findViewById(R.id.nav_header_username);
         emailTextView = navigationView.getHeaderView(0).findViewById(R.id.nav_header_email);
 
-        userNameTextView.setText(UserManager.getCurrentUser().getDisplayName());
-        emailTextView.setText(UserManager.getCurrentUser().getEmail());
-
+        if (UserManager.getCurrentUser() != null) {
+            userNameTextView.setText(UserManager.getCurrentUser().getDisplayName());
+            emailTextView.setText(UserManager.getCurrentUser().getEmail());
+        } else {
+            userNameTextView.setText("Guest");
+            emailTextView.setText("not avaliable");
+        }
 
         // Passing each menu ID as a set of Ids because each
         // menu should be considered as top level destinations.

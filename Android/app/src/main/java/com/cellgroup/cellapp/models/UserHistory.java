@@ -36,6 +36,11 @@ public class UserHistory {
 
     public static void createUserHistory(final Step step, final CreateUserHistoryCallBackDelegate createUserHistoryCallBackDelegate){
 
+        if (UserManager.getCurrentUser() == null) {
+            //TODO: add local user data
+            return;
+        }
+
         Map<String, Object> docData = new HashMap<>();
         docData.put("finish", true);
         docData.put("lastViewed", (new Date()).getTime());

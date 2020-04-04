@@ -47,7 +47,12 @@ public class TopicDocumentItemHolder extends RecyclerView.ViewHolder implements 
     public void bind(Doc doc, Context activity) {
         DocumentCompleteRate rate = doc.getCompletionRate();
         mainTextView.setText(activity.getText(R.string.setting_change_display_name));
-        secondaryTextView.setText(UserManager.getCurrentUser().getDisplayName());
+        if (UserManager.getCurrentUser() != null) {
+            secondaryTextView.setText(UserManager.getCurrentUser().getDisplayName());
+        } else {
+            secondaryTextView.setText("Guest");
+        }
+
 
         itemView.setBackgroundColor(Color.TRANSPARENT);
 

@@ -337,6 +337,12 @@ public class UserManager implements TimmerDelegate {
                 });
     }
 
+    public static void getUserManager(final Context activity){
+        shared = new UserManager(new UserData());
+        AppDelegate.shared.sharedUserManager = shared;
+        AppDelegate.shared.applicationLaunchingProcessDidFinishedCurrentTask(activity);
+    }
+
     public static void getUserManager(final FirebaseUser user, final Context activity){
         DocumentReference userRef = firebaseFirestore.collection("Users").document(user.getUid());
         userRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
@@ -376,6 +382,10 @@ public class UserManager implements TimmerDelegate {
     public void updateUserHistory(final Context activity){
         CollectionReference userHistoryRef = firebaseFirestore.collection("UserHistory");
         Log.d("new User History", "start");
+        if (UserManager.getCurrentUser() == null) {
+            NetworkManager.shared.networkManagerDidDownloadData(null, activity);
+            return;
+        }
         userHistoryRef.whereEqualTo("userID", UserManager.getCurrentUser().getUid()).get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
             @Override
             public void onComplete(@NonNull Task<QuerySnapshot> task) {
@@ -409,8 +419,11 @@ public class UserManager implements TimmerDelegate {
     }
 
     public boolean checkIfUserEmailVerified(final Context activity) {
-        Print.print(getCurrentUser().isEmailVerified());
-        return getCurrentUser().isEmailVerified();
+        if (getCurrentUser() != null) {
+            return getCurrentUser().isEmailVerified();
+        } else {
+            return true;
+        }
     }
 
     public void verifyEmail(final Context activity){
